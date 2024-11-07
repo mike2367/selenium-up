@@ -1,20 +1,12 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from typing import Literal, Union, Iterator, List
-from abc import ABC, abstractmethod
+from typing import Union, List
 from main import logger
 import random
 import time
-class DriverAction(ABC):
+class DriverAction():
 
     def __init__(self, driver, by: By) -> None:
-        super().__init__()
-        self.driver = driver
-        self.by = by
-class DriverAction(ABC):
-
-    def __init__(self, driver, by:By) -> None:
-        super().__init__()
         self.driver = driver
         self.by = by
     @logger.catch
@@ -122,11 +114,3 @@ class DriverAction(ABC):
             else:
                 action()
         
-
-    @logger.catch
-    @abstractmethod
-    def WorkFlow(**params)->None:
-        """
-        fill in your own implementation of the workflow
-        """
-        pass
