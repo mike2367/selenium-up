@@ -19,15 +19,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Step 3: Clone the remote stealth.min.js repository
       - name: Clone stealth.min.js Repository
         run: git clone git@github.com:requireCool/stealth.min.js.git remote-stealth
-
-      # Step 4: Replace local stealth.min.js with the one from the remote repository
+        
       - name: Update stealth.min.js
         run: cp remote-stealth/stealth.min.js resources/stealth.min.js
 
-      # Step 5: Commit and push changes if stealth.min.js has been updated
       - name: Commit and Push Changes
         run: |
           git config user.name "github-actions[bot]"
