@@ -3,7 +3,7 @@ name: Update stealth.min.js
 # Trigger the workflow on a schedule and manually
 on:
   schedule:
-    - cron: '* * * * *'  # Runs daily at midnight UTC
+    - cron: '0 7 * * 1'  # Runs daily at midnight UTC
   workflow_dispatch:
 
 jobs:
