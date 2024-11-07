@@ -6,9 +6,10 @@ import random
 import time
 class DriverAction():
 
-    def __init__(self, driver, by: By) -> None:
+    def __init__(self, driver, by: By, urls: Union[str, List[str]]) -> None:
         self.driver = driver
         self.by = by
+        self.urls = urls
     @logger.catch
     def click_element(self, value:str, elementname:str, log:bool = True)-> List[str]:
         element = self.driver.find_element(self.by, value)
@@ -89,6 +90,21 @@ class DriverAction():
                     new_height = self.driver.execute_script(js)
 
     @logger.catch
+    def addCookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
+        if isinstance(cookieinstance, dict):
+            self.driver.add_cookie(cookieinstance)
+            if 'expiry' in cookie:
+                del cookie['expiry']
+            if log:
+                logger.info(f"Added cookie: {cookieinstance}")
+        elif isinstance(cookieinstance, list):
+            for cookie in cookieinstance:
+                self.driver.add_cookie(cookie)
+                if 'expiry' in cookie:
+                    del cookie['expiry']
+                if log:
+                    logger.info(f"Added cookie: {cookie}")
+    @logger.catch
     def window_switch(self, ActionList:List[Union[int, callable]], log:bool = True)->None:
         """
         An action can be a window index or a function for taking element etc
@@ -113,4 +129,5 @@ class DriverAction():
                     logger.success(f"Switched to frame {action}")
             else:
                 action()
+
         
