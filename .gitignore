@@ -1,0 +1,7 @@
+# Ignore Chrome
+chrome/
+
+# Ignore Firefox
+firefox/
+# End Generation Here
+```
