@@ -1,16 +1,18 @@
-import random
 from typing import Literal, Union
 from selenium import webdriver
 from main import logger
 import settings
 
 standard_option: list = [
-    "--user-agent={}".format(random.choice(settings.ua_list)),
     "--incognito",
     "--disable-gpu",
-    "--disable-blink-features",
     "--disable-blink-features=AutomationControlled"
 ]
+
+experimental_option: dict = {
+    "detach":True,
+    "excludeSwitches":['enable-automation', 'enable-logging']
+}
 
 class Driver_core():
     def __init__(self, 
@@ -19,17 +21,7 @@ class Driver_core():
         headless:bool = False,
         detach:bool = True         
     ) -> None:
-        """
-        Initialize a Connection object with the provided parameters.
-
-        Parameters:
-        url (str): The URL to connect to.
-        selenium_driverType (Literal['Chrome', 'Firefox'], optional): The type of Selenium WebDriver to use. Defaults to 'Chrome'.
-        DriverOption_param (Union[None, list], optional): Additional options for the WebDriver. Defaults to None.
-        Headless (bool): Whether to run the WebDriver in headless mode, in here because regularly used. Defaults to False.
-        Returns:
-        None
-        """
+        
         self.selenium_driverType = selenium_driverType
         self.DriverOption_param = DriverOption_param
         self.headless = headless
@@ -53,23 +45,38 @@ class Driver_core():
     def driver_instance(self):
         if self.selenium_driverType == 'Chrome':
             options = webdriver.ChromeOptions()
+            # config your own binary loc in settings
             options.binary_location = settings.CHROMIUM
             for item in self.opt_params:
                 options.add_argument(item)
-            options.add_experimental_option("detach", self.detach)
+            for opt in experimental_option:
+                options.add_experimental_option(opt, experimental_option[opt])
             driver = webdriver.Chrome(options=options)
 
 
         elif self.selenium_driverType == 'Firefox':
             options = webdriver.FirefoxOptions()
+            # config your own binary loc in settings
             options.binary_location = settings.FIREFOX
             for item in self.opt_params:
                 options.add_argument(item)
-            options.add_experimental_option("detach", self.detach)
+            for opt in experimental_option:
+                options.add_experimental_option(opt, experimental_option[opt])
             driver = webdriver.Firefox(options=options)
         
         if driver:
             driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {'source': self.js})
+            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": """
+           Object.defineProperty(navigator, 'deviceMemory', {
+                 get: () => 8
+           });
+           Object.defineProperty(navigator, 'userAgent', {
+             get: () => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
+           });
+    """
+                })
+
             logger.success("Selenium driver successfully initialized")
         return driver
     

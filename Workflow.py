@@ -1,17 +1,17 @@
 from main import logger
-from Connection import Connection
+from Connection import Driver_core
 from DriverAction import DriverAction, By
 from SaveAction import SaveToolKit
-from ParseToolkits import ToolKits
+from ParseToolkits import ParseToolKits
 from abc import ABC, abstractmethod
-from typing import Union, Literal, List
+from typing import Union, List
 
 
 class Workflow(ABC):
     def __init__(self, by:By, urls: Union[str, List[str]], *params:any) -> None:
         
         super().__init__()
-        self.driver = Connection(*params).driver_instance()
+        self.driver = Driver_core(*params).driver_instance()
         self.by = by
         self.driver_action = DriverAction(self.driver, self.by)
         self.urls = urls

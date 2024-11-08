@@ -7,3 +7,5 @@ firefox/
 ```
 
 Log.log
+
+__pycache__/

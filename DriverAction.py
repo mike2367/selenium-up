@@ -9,8 +9,7 @@ import random
 import time
 class DriverAction():
 
-    def __init__(self, driver:any = Driver_core().driver_instance(), 
-                 by: By = By.XPATH) -> None:
+    def __init__(self, driver, by: By) -> None:
         self.driver = driver
         self.by = by
     @logger.catch
@@ -156,5 +155,6 @@ class DriverAction():
                 logger.warning(f"Selenium driver signiture test failed in: {tr.text}, type: {td.text}")
         
         if all_pass:
-            logger.info("Selenium driver signiture test passed")
+            logger.success("Selenium driver signiture passed")
+
 
