@@ -34,7 +34,7 @@ class Driver_core():
         # for fingerprint elimination
         with open('./resources/stealth.min.js', 'r') as f:
             self.js = f.read()
-
+        f.close()
 
     def __repr__(self) -> str:
         return f"""
@@ -66,6 +66,7 @@ class Driver_core():
         
         if driver:
             driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {'source': self.js})
+            # To deal with CHR memory fail
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": """
            Object.defineProperty(navigator, 'deviceMemory', {
@@ -76,7 +77,7 @@ class Driver_core():
            });
     """
                 })
-
+            
             logger.success("Selenium driver successfully initialized")
         return driver
     

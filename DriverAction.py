@@ -2,7 +2,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from typing import Union, List
 from main import logger
-from Connection import Driver_core
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import random
@@ -49,11 +48,19 @@ class DriverAction():
         return result
     
     @logger.catch
-    def input_keys(self, value:str, log:bool = True, **param:any)->None:
+    def input_keys(self, value:str, log:bool = True, *keys:any)->None:
         element = self.driver.find_element(self.by, value)
-        element.send_keys(param)
+        element.send_keys(*keys)
         if log:
-            logger.info(f"Input text {str(param)} into element")
+            logger.info(f"Input text {str(*keys)} into element")
+
+    @logger.catch
+    def wait_element(self, value: str, wait_time: int = 20, log: bool = True) -> None:
+        element = WebDriverWait(self.driver, wait_time).until(
+            EC.presence_of_element_located((self.by, value))
+        )
+        if log:
+            logger.info(f"Wait for element {value}")
 
     @logger.catch
     def slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
@@ -94,7 +101,7 @@ class DriverAction():
                 logger.info(f"Scroll down to the bottom")
 
     @logger.catch
-    def addCookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
+    def add_cookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
         if isinstance(cookieinstance, dict):
             self.driver.add_cookie(cookieinstance)
             if 'expiry' in cookie:
@@ -139,7 +146,7 @@ class DriverAction():
         if log:
             logger.info(f"frame switch completed")
 
-        
+    
     @staticmethod
     @logger.catch
     def driver_signiture_validation(driver):

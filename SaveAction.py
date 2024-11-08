@@ -16,7 +16,17 @@ class SaveToolKit():
         f.close()
 
     
-    @logger.catch
+    def error_rollback(func):
+        def wrapper(cursor, table_name, item_list):
+            try:
+                func(cursor, table_name, item_list)
+            except Exception as e:
+                cursor.rollback()
+                logger.error(f"Error inserting records into {table_name}, rollback is initiated")
+                raise
+        return wrapper
+
+    @error_rollback
     @staticmethod
     def mysql_insert(cursor:any, table_name:str, item_list:List[dict])->None:
         if not item_list:
