@@ -54,7 +54,7 @@ class SaveToolKit():
 
     @logger.catch
     @staticmethod
-    def redis_insert(self, redis_client:any, item_list: List[dict], key_field: str, Hash:bool = True) -> None:
+    def redis_insert(redis_client:any, item_list: List[dict], key_field: str, Hash:bool = True) -> None:
         if not item_list:
             logger.warning("item list is empty for redis_insert.")
             return

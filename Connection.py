@@ -18,8 +18,7 @@ class Driver_core():
     def __init__(self, 
         selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
         DriverOption_param:Union[None, list] = None,
-        headless:bool = False,
-        detach:bool = True         
+        headless:bool = False,    
     ) -> None:
         
         self.selenium_driverType = selenium_driverType
@@ -30,10 +29,19 @@ class Driver_core():
             self.opt_params.append("--headless")
         # avoid repeated settings
         self.opt_params = list(set(self.opt_params))
-        self.detach = detach
+
         # for fingerprint elimination
+        self.script_func = 'Page.addScriptToEvaluateOnNewDocument'
+        self.CHR_mem_js = """
+           Object.defineProperty(navigator, 'deviceMemory', {
+                 get: () => 8
+           });
+           Object.defineProperty(navigator, 'userAgent', {
+             get: () => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
+           });
+            """
         with open('./resources/stealth.min.js', 'r') as f:
-            self.js = f.read()
+            self.stealth_js = f.read()
         f.close()
 
     def __repr__(self) -> str:
@@ -65,17 +73,10 @@ class Driver_core():
             driver = webdriver.Firefox(options=options)
         
         if driver:
-            driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {'source': self.js})
+            driver.execute_cdp_cmd(self.script_func, {'source': self.stealth_js})
             # To deal with CHR memory fail
-            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                "source": """
-           Object.defineProperty(navigator, 'deviceMemory', {
-                 get: () => 8
-           });
-           Object.defineProperty(navigator, 'userAgent', {
-             get: () => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
-           });
-    """
+            driver.execute_cdp_cmd(self.script_func, {
+                "source": self.CHR_mem_js
                 })
             
             logger.success("Selenium driver successfully initialized")
