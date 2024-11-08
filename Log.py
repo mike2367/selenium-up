@@ -4,7 +4,6 @@ import sys
 from notifiers.logging import NotificationHandler
 from typing import Union
 class Customized_Log:
-    log = logger
     def __init__(self) -> None:
         self.custom_logger = logger
     
