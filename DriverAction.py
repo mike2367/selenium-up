@@ -15,7 +15,7 @@ class DriverAction():
         element = self.driver.find_element(self.by, value)
         element.click()
         if log:
-            logger.success(f"Clicked on element {elementname}")
+            logger.info(f"Clicked on element {elementname}")
         return self.driver.window_handles
     
     @logger.catch
@@ -26,7 +26,7 @@ class DriverAction():
         actions.double_click(element).perform()
         
         if log:
-            logger.success(f"Doubled clicked on element {elementname}")
+            logger.info(f"Doubled clicked on element {elementname}")
         return self.driver.window_handles
     @logger.catch
     def right_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
@@ -36,14 +36,14 @@ class DriverAction():
         actions.context_click(element).perform()
         
         if log:
-            logger.success(f"Right clicked on element {elementname}")
+            logger.info(f"Right clicked on element {elementname}")
         return self.driver.window_handles
     @logger.catch
     def get_element_attribute(self, value:str, attribute:str, log:bool = True)->str:
         element = self.driver.find_element(self.by, value)
         result = element.get_attribute(attribute).strip()
         if log:
-            logger.success(f"Get attribute {attribute} on element, result: {result}")
+            logger.info(f"Get attribute {attribute} on element, result: {result}")
         return result
     
     @logger.catch
@@ -51,7 +51,7 @@ class DriverAction():
         element = self.driver.find_element(self.by, value)
         element.send_keys(param)
         if log:
-            logger.success(f"Input text {str(param)} into element")
+            logger.info(f"Input text {str(param)} into element")
 
     @logger.catch
     def slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
@@ -59,7 +59,7 @@ class DriverAction():
         actions = ActionChains(self.driver)
         actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
         if log:
-            logger.success(f"Slide element by offset {offset}")
+            logger.info(f"Slide element by offset {offset}")
     @logger.catch
     def scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True)->None:
         """
@@ -71,13 +71,13 @@ class DriverAction():
         if pixel:
             self.driver.execute_script('window.scrollBy(0,{})'.format(str(pixel)))
             if log:
-                logger.success(f"Scroll down {pixel} pixel")
+                logger.info(f"Scroll down {pixel} pixel")
             return
         elif value:
             element = self.driver.find_element(self.by, value)
             self.driver.execute_script("arguments[0].scrollIntoView();", element)
             if log:
-                logger.success(f"Scroll down to element {value}")
+                logger.info(f"Scroll down to element {value}")
         else:
             js = "return action=document.body.scrollHeight"
             height = 0
@@ -88,6 +88,8 @@ class DriverAction():
                     height = new_height
                     time.sleep(sleep_time)
                     new_height = self.driver.execute_script(js)
+            if log:
+                logger.info(f"Scroll down to the bottom")
 
     @logger.catch
     def addCookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
@@ -113,9 +115,11 @@ class DriverAction():
             if isinstance(action, int):
                 self.driver.switch_to.window(action)
                 if log:
-                    logger.success(f"Switched to window {self.driver.title}")
+                    logger.info(f"Switched to window {self.driver.title}")
             else:
                 action()
+        if log:
+            logger.info(f"window switch completed")
 
     @logger.catch
     def frame_switch(self, ActionList:List[Union[str, callable]], log:bool = True)->None:
@@ -126,8 +130,11 @@ class DriverAction():
             if isinstance(action, str):
                 self.driver.switch_to.frame(action)
                 if log:
-                    logger.success(f"Switched to frame {action}")
+                    logger.info(f"Switched to frame {action}")
             else:
                 action()
+
+        if log:
+            logger.info(f"frame switch completed")
 
         

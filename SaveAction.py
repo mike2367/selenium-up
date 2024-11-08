@@ -1,14 +1,9 @@
 from main import logger
 from typing import List, Union
 import csv
-import pymysql
-import pymongo
-import redis
 
 
-class SaveAction():
-    def __init__(self) -> None:
-        pass
+class SaveToolKit():
     
     @logger.catch
     @staticmethod
@@ -20,11 +15,42 @@ class SaveAction():
             writer.writerows(item_list)
         f.close()
 
-    def mysql_service(self)->None:
-        pass
+    
+    @logger.catch
+    @staticmethod
+    def mysql_insert(cursor:any, table_name:str, item_list:List[dict])->None:
+        if not item_list:
+            logger.warning("item list is empty for mysql_insert, table_name: {}".format(table_name))
+            return 
 
-    def mongodb_service(self)->None:
-        pass
+        columns = item_list[0].keys()
+        placeholders = ', '.join(['%s'] * len(columns))
+        columns_joined = ', '.join(f"`{col}`" for col in columns)
+        sql = f"INSERT INTO `{table_name}` ({columns_joined}) VALUES ({placeholders})"
+        values = [tuple(item[col] for col in columns) for item in item_list]
+        cursor.executemany(sql, values)
+        logger.success(f"Inserted {len(item_list)} records into {table_name}.")
 
-    def redis_service(self)->None:
-        pass
+
+    @logger.catch
+    @staticmethod
+    def mongodb_insert(collection:any, item_list: List[dict]) -> None:
+        if not item_list:
+            logger.warning("item list is empty for mongodb_insert.")
+            return
+        result = collection.insert_many(item_list)
+        logger.success(f"Inserted {len(result.inserted_ids)} records into MongoDB collection.")
+
+
+    @logger.catch
+    @staticmethod
+    def redis_insert(self, redis_client:any, item_list: List[dict], key_field: str, Hash:bool = True) -> None:
+        if not item_list:
+            logger.warning("item list is empty for redis_insert.")
+            return
+        for item in item_list:
+            key = item.get(key_field)
+            if key:
+                redis_client.hset(key, mapping=item) if Hash else redis_client.set(key, item)
+        logger.success(f"Inserted {len(item_list)} records into Redis.")
+
