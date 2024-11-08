@@ -3,6 +3,7 @@ from typing import Literal, Union
 from selenium import webdriver
 from main import logger
 import settings
+
 standard_option: list = [
     "--user-agent={}".format(random.choice(settings.ua_list)),
     "--incognito",
@@ -11,11 +12,12 @@ standard_option: list = [
     "--disable-blink-features=AutomationControlled"
 ]
 
-class Connection():
+class Driver_core():
     def __init__(self, 
         selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
         DriverOption_param:Union[None, list] = None,
-        headless:bool = False         
+        headless:bool = False,
+        detach:bool = True         
     ) -> None:
         """
         Initialize a Connection object with the provided parameters.
@@ -36,8 +38,9 @@ class Connection():
             self.opt_params.append("--headless")
         # avoid repeated settings
         self.opt_params = list(set(self.opt_params))
+        self.detach = detach
         # for fingerprint elimination
-        with open('stealth.min.js', 'r') as f:
+        with open('./resources/stealth.min.js', 'r') as f:
             self.js = f.read()
 
 
@@ -53,6 +56,7 @@ class Connection():
             options.binary_location = settings.CHROMIUM
             for item in self.opt_params:
                 options.add_argument(item)
+            options.add_experimental_option("detach", self.detach)
             driver = webdriver.Chrome(options=options)
 
 
@@ -61,10 +65,11 @@ class Connection():
             options.binary_location = settings.FIREFOX
             for item in self.opt_params:
                 options.add_argument(item)
+            options.add_experimental_option("detach", self.detach)
             driver = webdriver.Firefox(options=options)
-
+        
         if driver:
             driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {'source': self.js})
-            logger.success("Selenium driver initialized")
+            logger.success("Selenium driver successfully initialized")
         return driver
     

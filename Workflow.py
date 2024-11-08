@@ -8,13 +8,13 @@ from typing import Union, Literal, List
 
 
 class Workflow(ABC):
-    def __init__(self, by:By, *params:any) -> None:
+    def __init__(self, by:By, urls: Union[str, List[str]], *params:any) -> None:
         
         super().__init__()
         self.driver = Connection(*params).driver_instance()
         self.by = by
         self.driver_action = DriverAction(self.driver, self.by)
-
+        self.urls = urls
     @logger.catch
     @abstractmethod
     def driver_flow(self) -> any:

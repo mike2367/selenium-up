@@ -2,14 +2,17 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from typing import Union, List
 from main import logger
+from Connection import Driver_core
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import random
 import time
 class DriverAction():
 
-    def __init__(self, driver, by: By, urls: Union[str, List[str]]) -> None:
+    def __init__(self, driver:any = Driver_core().driver_instance(), 
+                 by: By = By.XPATH) -> None:
         self.driver = driver
         self.by = by
-        self.urls = urls
     @logger.catch
     def click_element(self, value:str, elementname:str, log:bool = True)-> List[str]:
         element = self.driver.find_element(self.by, value)
@@ -138,3 +141,20 @@ class DriverAction():
             logger.info(f"frame switch completed")
 
         
+    @staticmethod
+    @logger.catch
+    def driver_signiture_validation(driver):
+        base_url = "https://bot.sannysoft.com/"
+        driver.get(base_url)
+        all_pass = True
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="fp2"]/tr[20]/td[2]')))
+        tds = driver.find_elements(by=By.XPATH, value='//*[@id="fp2"]/tr/td[2]')
+        for td in tds:
+            if td.text != "ok":
+                all_pass = False
+                tr = driver.find_element(by=By.XPATH, value='//*[@id="fp2"]/tr[{}]/td[1]'.format(tds.index(td) + 1))
+                logger.warning(f"Selenium driver signiture test failed in: {tr.text}, type: {td.text}")
+        
+        if all_pass:
+            logger.info("Selenium driver signiture test passed")
+
