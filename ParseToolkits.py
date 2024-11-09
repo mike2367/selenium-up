@@ -8,6 +8,7 @@ table_colorplan = {
     "row": "\033[92m",        # Green
 }
 class ParseToolKits():
+    @logger.catch
     @staticmethod
     def dict_search(items:dict, key: str, log:bool = False) -> Iterator:
         result_num = 0
@@ -27,7 +28,7 @@ class ParseToolKits():
                     stack.append(v)
         if log:
             logger.info("dict search completed, result_num: {result_num}")
-
+    @logger.catch
     @staticmethod
     def spot_difference(item1, item2, title: str = "Difference Table", log: bool = False) -> dict:
         """
@@ -109,7 +110,7 @@ class ParseToolKits():
                 logger.info("\nDifferences found:\n" + log_table.get_string())
 
         return differences
-
+    @logger.catch
     @staticmethod
     def table_output(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
         if not item_list:

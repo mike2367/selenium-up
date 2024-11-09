@@ -52,8 +52,7 @@ class Customized_Log:
             except Exception as e:
                 logger.error(f"Failed to set up email handler: {e}")
 
-    def level_setting(self, level:str) -> None:
-        self.logger.remove()
+    def level_setting(self, level:str="ERROR") -> None:
         """
         Add a new terminal for higher level log processing
         """

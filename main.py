@@ -12,6 +12,7 @@ os.chdir(current_directory)
 """
 param = {}
 logger_instance = Customized_Log()
+logger_instance.level_setting()
 logger = logger_instance.log_setting(contact_param=param)
 
 
