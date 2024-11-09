@@ -149,7 +149,7 @@ class DriverAction():
     
     @staticmethod
     @logger.catch
-    def driver_signiture_validation(driver):
+    def driver_signiture_validate(driver):
         base_url = "https://bot.sannysoft.com/"
         driver.get(base_url)
         all_pass = True

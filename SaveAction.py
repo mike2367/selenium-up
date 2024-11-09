@@ -1,5 +1,7 @@
 from main import logger
-from typing import List, Union
+from typing import List, Iterator
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 import csv
 
 
@@ -7,14 +9,25 @@ class SaveToolKit():
     
     @logger.catch
     @staticmethod
-    def csv_save(filename:str, item_list:List[dict], header:list = None, encoding:str = 'utf-8')->None:
-        with open(filename, 'a', newline='', encoding=encoding) as f:
-            writer = csv.DictWriter(f, fieldnames=header)
-            if header:
-                writer.writeheader()
-            writer.writerows(item_list)
-        f.close()
-
+    def csv_save(filename:str, item_list:Iterator[dict], encoding:str = 'utf-8', max_workers:int = 30, log:bool = True)->None:
+        lock = Lock()
+        def single_item(item:dict, write_headers:bool = True)->None:
+            header = list(item.keys())
+            mode = 'w' if write_headers else 'a'
+            with lock:
+                with open(filename, mode, newline='', encoding=encoding) as f:
+                    writer = csv.DictWriter(f, fieldnames=header)
+                    if write_headers:
+                        writer.writeheader()
+                    writer.writerow(item)
+        first = True
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            for num, item in enumerate(item_list, start=1):
+                executor.submit(single_item, item, first)
+                first = False
+        if log:
+            logger.success(f"Inserted {num} records into {filename}.")
+        executor.shutdown()
     
     def error_rollback(func):
         def wrapper(cursor, table_name, item_list):
@@ -28,9 +41,9 @@ class SaveToolKit():
 
     @error_rollback
     @staticmethod
-    def mysql_insert(cursor:any, table_name:str, item_list:List[dict])->None:
+    def mysql_insert(cursor:any, table_name:str, item_list:List[dict], log:bool = True)->None:
         if not item_list:
-            logger.warning("item list is empty for mysql_insert, table_name: {}".format(table_name))
+            logger.warning("item list is empty for mysql_insert, table_name: {table_name}")
             return 
 
         columns = item_list[0].keys()
@@ -39,22 +52,24 @@ class SaveToolKit():
         sql = f"INSERT INTO `{table_name}` ({columns_joined}) VALUES ({placeholders})"
         values = [tuple(item[col] for col in columns) for item in item_list]
         cursor.executemany(sql, values)
-        logger.success(f"Inserted {len(item_list)} records into {table_name}.")
+        if log:
+            logger.success(f"Inserted {len(item_list)} records into {table_name}.")
 
 
     @logger.catch
     @staticmethod
-    def mongodb_insert(collection:any, item_list: List[dict]) -> None:
+    def mongodb_insert(collection:any, item_list: List[dict], log:bool = True) -> None:
         if not item_list:
             logger.warning("item list is empty for mongodb_insert.")
             return
         result = collection.insert_many(item_list)
-        logger.success(f"Inserted {len(result.inserted_ids)} records into MongoDB collection.")
+        if log:
+            logger.success(f"Inserted {len(result.inserted_ids)} records into MongoDB collection.")
 
 
     @logger.catch
     @staticmethod
-    def redis_insert(redis_client:any, item_list: List[dict], key_field: str, Hash:bool = True) -> None:
+    def redis_insert(redis_client:any, item_list: List[dict], key_field: str, Hash:bool = True, log:bool = True) -> None:
         if not item_list:
             logger.warning("item list is empty for redis_insert.")
             return
@@ -62,5 +77,6 @@ class SaveToolKit():
             key = item.get(key_field)
             if key:
                 redis_client.hset(key, mapping=item) if Hash else redis_client.set(key, item)
-        logger.success(f"Inserted {len(item_list)} records into Redis.")
+        if log:
+            logger.success(f"Inserted {len(item_list)} records into Redis.")
 

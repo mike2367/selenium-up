@@ -17,7 +17,7 @@ class Workflow(ABC):
         self.urls = urls
     @logger.catch
     @abstractmethod
-    def driver_flow(self) -> any:
+    def main_driver_flow(self) -> any:
         return """
         complete your own driver flow
         """
@@ -33,6 +33,6 @@ class Workflow(ABC):
 
     @logger.catch
     def run(self):
-        output = self.driver_flow()
+        output = self.main_driver_flow()
         parse_result = self.parse_flow(output)
         self.save_flow(parse_result)
