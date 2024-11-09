@@ -17,9 +17,46 @@ experimental_option: dict = {
 class Driver_core():
     def __init__(self, 
         selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
-        DriverOption_param:Union[None, list] = None,
-        headless:bool = False,    
+        DriverOption_param: Union[None, list] = None,
+        headless: bool = False,    
     ) -> None:
+        """
+        Initializes the Driver_core class with specified browser settings.
+
+        Parameters:
+        -----------
+        selenium_driverType : Literal['Chrome', 'Firefox'], optional
+            The type of Selenium WebDriver to use. Defaults to 'Chrome'.
+        
+        DriverOption_param : Union[None, list], optional
+            Additional driver options to be used. Defaults to None.
+        
+        headless : bool, optional
+            If set to True, the browser will run in headless mode. Defaults to False.
+
+        Attributes:
+        -----------
+        selenium_driverType : str
+            Stores the type of Selenium WebDriver.
+        
+        DriverOption_param : Union[None, list]
+            Stores additional driver options.
+        
+        headless : bool
+            Indicates if the browser should run in headless mode.
+        
+        opt_params : list
+            A list of options to be used by the WebDriver, including standard options and any additional options provided.
+        
+        script_func : str
+            The function name used for adding js scripts to evaluate on a new document.
+        
+        CHR_mem_js : str
+            JavaScript code to modify the navigator properties for fingerprint elimination.
+        
+        stealth_js : str
+            JavaScript code read from 'stealth.min.js' for further fingerprint elimination.
+        """
         
         self.selenium_driverType = selenium_driverType
         self.DriverOption_param = DriverOption_param
@@ -51,6 +88,15 @@ class Driver_core():
 
     @logger.catch
     def driver_instance(self):
+        """
+        Initializes and returns a Selenium WebDriver instance based on the specified browser type.
+
+        This function configures the WebDriver with the specified options and experimental settings,
+        and applies scripts to modify browser fingerprinting properties.
+
+        Returns:
+            WebDriver: A configured Selenium WebDriver instance for the specified browser type.
+        """
         if self.selenium_driverType == 'Chrome':
             options = webdriver.ChromeOptions()
             # config your own binary loc in settings
@@ -71,14 +117,15 @@ class Driver_core():
             for opt in experimental_option:
                 options.add_experimental_option(opt, experimental_option[opt])
             driver = webdriver.Firefox(options=options)
-        
+
         if driver:
             driver.execute_cdp_cmd(self.script_func, {'source': self.stealth_js})
             # To deal with CHR memory fail
             driver.execute_cdp_cmd(self.script_func, {
                 "source": self.CHR_mem_js
                 })
-            
+
             logger.success("Selenium driver successfully initialized")
         return driver
+
     

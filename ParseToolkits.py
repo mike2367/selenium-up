@@ -5,12 +5,25 @@ from prettytable import PrettyTable
 table_colorplan = {
     "title": "\033[95m",      # Magenta
     "header": "\033[33m",     # Blue
-    "row": "\033[92m",        # Green
+    "row": "\033[92m",        # Greenss
+    "default": "\033[0m"        
 }
+
 class ParseToolKits():
     @logger.catch
     @staticmethod
-    def dict_search(items:dict, key: str, log:bool = False) -> Iterator:
+    def dict_search(items: dict, key: str, log: bool = False) -> Iterator:
+        """
+        Searches for a specified key in a nested dictionary or list structure and yields its values.
+
+        Args:
+            items (dict): The dictionary or list to search within.
+            key (str): The key to search for in the dictionary.
+            log (bool): If True, logs the number of results found. Default is False.
+
+        Yields:
+            Iterator: An iterator over the values associated with the specified key.
+        """
         result_num = 0
         stack = [items]
         while stack:
@@ -28,11 +41,12 @@ class ParseToolKits():
                     stack.append(v)
         if log:
             logger.info("dict search completed, result_num: {result_num}")
+
     @logger.catch
     @staticmethod
     def spot_difference(item1, item2, title: str = "Difference Table", log: bool = False) -> dict:
         """
-        Compare two JSON-like structures (dicts, lists) and identify differences.
+        Compare two JSON-like structures (dicts, lists) and output differences in table.
 
         Args:
             item1: First JSON-like structure (dict or list).
@@ -85,21 +99,21 @@ class ParseToolKits():
             # Non-log version with color
             table = PrettyTable()
             if title:
-                table.title = table_colorplan["title"] + title + "\033[0m"
+                table.title = table_colorplan["title"] + title + table_colorplan["default"]
             table.field_names = [
-                table_colorplan["header"] + "Field" + "\033[0m",
-                table_colorplan["header"] + "Item1" + "\033[0m",
-                table_colorplan["header"] + "Item2" + "\033[0m",
+                table_colorplan["header"] + "Field" + table_colorplan["default"],
+                table_colorplan["header"] + "Item1" + table_colorplan["default"],
+                table_colorplan["header"] + "Item2" + table_colorplan["default"],
             ]
             for field, (val1, val2) in differences.items():
                 table.add_row([
-                    table_colorplan["row"] + field + "\033[0m",
-                    table_colorplan["row"] + str(val1) + "\033[0m",
-                    table_colorplan["row"] + str(val2) + "\033[0m",
+                    table_colorplan["row"] + field + table_colorplan["default"],
+                    table_colorplan["row"] + str(val1) + table_colorplan["default"],
+                    table_colorplan["row"] + str(val2) + table_colorplan["default"],
                 ])
             print(table)
 
-            # Log version without color
+            # No color version for log
             if log:
                 log_table = PrettyTable()
                 if title:
@@ -113,15 +127,29 @@ class ParseToolKits():
     @logger.catch
     @staticmethod
     def table_output(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
+        """
+        Prints a table of items in a list of dictionaries.
+
+        This function takes a list of dictionaries, where each dictionary represents a row in the table.
+        It prints the table with optional title and logs the table to the console if the 'log' parameter is True.
+
+        Parameters:
+        - item_list (List[dict]): A list of dictionaries, where each dictionary represents a row in the table.
+        - title (str): The title of the table. Default is "Info Table".
+        - log (bool): A flag indicating whether to log the table to the console. Default is False.
+
+        Returns:
+        - None
+        """
         if not item_list:
             logger.warning("No items to display in table.")
             return
         table = PrettyTable()
         if title:
-            table.title = table_colorplan["title"] + title + "\033[0m"
-        table.field_names = [table_colorplan["header"] + key + "\033[0m" for key in item_list[0].keys()]
+            table.title = table_colorplan["title"] + title + table_colorplan["default"]
+        table.field_names = [table_colorplan["header"] + key + table_colorplan["default"] for key in item_list[0].keys()]
         for item in item_list:
-            table.add_row([table_colorplan["row"] + str(value) + "\033[0m" for value in item.values()])
+            table.add_row([table_colorplan["row"] + str(value) + table_colorplan["default"] for value in item.values()])
 
         print(table)
         # No color version for log
@@ -132,6 +160,6 @@ class ParseToolKits():
             log_table.field_names = list(item_list[0].keys())
             for item in item_list:
                 log_table.add_row([str(value) for value in item.values()])
-            logger.info("\nParse Table output:\n" + log_table.get_string())
+            logger.info("\nInfo Table Output:\n" + log_table.get_string())
 
-            
+

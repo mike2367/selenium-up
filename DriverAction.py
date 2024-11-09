@@ -7,6 +7,42 @@ from selenium.webdriver.support.ui import WebDriverWait
 import random
 import time
 class DriverAction():
+    """
+    A class to perform various actions on web elements using Selenium WebDriver.
+
+    Attributes:
+    -----------
+    driver : WebDriver
+        The Selenium WebDriver instance used to interact with the web browser.
+    by : By
+        The method used to locate elements on the web page.
+
+    Methods:
+    --------
+    click_element(value: str, elementname: str, log: bool = True) -> List[str]:
+        Clicks on a web element and logs the action.
+
+    double_click(value: str, elementname: str, log: bool = True) -> List[str]:
+        Double-clicks on a web element and logs the action.
+
+    right_click(value: str, elementname: str, log: bool = True) -> List[str]:
+        Right-clicks on a web element and logs the action.
+
+    get_element_attribute(value: str, attribute: str, log: bool = True) -> str:
+        Retrieves the value of a specified attribute from a web element and logs the action.
+
+    input_keys(value: str, log: bool = True, *keys: any) -> None:
+        Sends keys to a web element and logs the action.
+
+    wait_element(value: str, wait_time: int = 20, log: bool = True) -> None:
+        Waits for a web element to be present on the web page and logs the action.
+        
+    slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
+        Slides a web element horizontally by a specified offset and logs the action.
+    
+    scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True)->None:
+        Scrolls the web page down and logs the action.
+    """
 
     def __init__(self, driver, by: By) -> None:
         self.driver = driver
@@ -118,7 +154,9 @@ class DriverAction():
     @logger.catch
     def window_switch(self, ActionList:List[Union[int, callable]], log:bool = True)->None:
         """
-        An action can be a window index or a function for taking element etc
+        This function works as a second layer for abstract workflow,
+        packing up a chain of action in ActionList for execution.
+        An action can be a window index or a function for taking element etc.
         """
         for action in ActionList:
             if isinstance(action, int):
@@ -133,7 +171,9 @@ class DriverAction():
     @logger.catch
     def frame_switch(self, ActionList:List[Union[str, callable]], log:bool = True)->None:
         """
-        An action can be a frame name or a function for taking element etc
+        This function works as a second layer for abstract workflow,
+        packing up a chain of action in ActionList for execution.
+        An action can be a frame name or a function for taking element etc.
         """
         for action in ActionList:
             if isinstance(action, str):
@@ -150,6 +190,21 @@ class DriverAction():
     @staticmethod
     @logger.catch
     def driver_signiture_validate(driver):
+        """
+        Validates the Selenium WebDriver's signature by navigating to bot.sannysoft.com,
+        which is specially made for signiture test.
+
+        Parameters:
+        -----------
+        driver : WebDriver
+            The Selenium WebDriver instance used to interact with the web browser.
+
+        Returns:
+        --------
+        None
+            Logs the result of the validation process. If all checks pass, logs a success message.
+            Otherwise, logs warnings for each failed check.
+        """
         base_url = "https://bot.sannysoft.com/"
         driver.get(base_url)
         all_pass = True
@@ -160,8 +215,9 @@ class DriverAction():
                 all_pass = False
                 tr = driver.find_element(by=By.XPATH, value='//*[@id="fp2"]/tr[{}]/td[1]'.format(tds.index(td) + 1))
                 logger.warning(f"Selenium driver signiture test failed in: {tr.text}, type: {td.text}")
-        
+
         if all_pass:
             logger.success("Selenium driver signiture passed")
+
 
 
