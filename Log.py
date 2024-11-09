@@ -1,32 +1,31 @@
 from loguru import logger
 import yagmail
 import sys
-from notifiers.logging import NotificationHandler
 from typing import Union
 class Customized_Log:
-    def __init__(self) -> None:
-        self.custom_logger = logger
-    
-    def log_setting(self, filepath:str = "./Log.log",
-                    rotation:str = "00:00",
-                    level:str = "DEBUG",
-                    Format:str = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
-                    email_level:str = None,
-                    contact_param:Union[dict, None] = None
-                    ) -> any:
+    def __init__(self, filepath: str = "./Log.log",
+                     rotation: str = "00:00",
+                     level: str = "DEBUG",
+                     Format: str = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
+                     email_level: str = None,
+                     contact_param: Union[dict, None] = None
+                     ) -> None:
         """
-        set loguru logger setting.
+        Initialize the Customized_Log class and set up the logger.
 
-        Args:
-            filepath (str): The log file path. Defaults to "./Log.log".
-            rotation (str): The log file rotation time. Defaults to "00:00".
-            level (str): The log level. Defaults to "DEBUG".
-            Format (str): The log format string. Defaults to "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}".
+            Args:
+                filepath (str): The log file path. Defaults to "./Log.log".
+                rotation (str): The log file rotation time. Defaults to "00:00".
+                level (str): The log level. Defaults to "DEBUG".
+                Format (str): The log format string. Defaults to "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}".
+                email_level (str, optional): The log level for email notifications. Defaults to None.
+                contact_param (Union[dict, None], optional): Parameters for email notifications. Defaults to None.
         """
+        self.custom_logger = logger
         self.custom_logger.add(filepath, rotation=rotation, level=level, format=Format)
-        self.email_setting(email_level, contact_param)
+        self._email_setting(email_level, contact_param)
         return self.custom_logger
-    def email_setting(self, level:str = "ERROR", param:Union[dict, None] = None) -> None:
+    def _email_setting(self, level:str = "ERROR", param:Union[dict, None] = None) -> None:
         """
         Send email to the contact specified in the 'contact_param' dictionary once an error occurs.
 
@@ -52,7 +51,7 @@ class Customized_Log:
             except Exception as e:
                 logger.error(f"Failed to set up email handler: {e}")
 
-    def level_setting(self, level:str="ERROR") -> None:
+    def set_new_terminal_level(self, level:str="ERROR") -> None:
         """
         Add a new terminal for higher level log processing
         """

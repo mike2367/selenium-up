@@ -12,9 +12,9 @@ class DriverAction():
 
     Attributes:
     -----------
-    driver : WebDriver
+    _driver : WebDriver
         The Selenium WebDriver instance used to interact with the web browser.
-    by : By
+    _by : By
         The method used to locate elements on the web page.
 
     Methods:
@@ -45,39 +45,39 @@ class DriverAction():
     """
 
     def __init__(self, driver, by: By) -> None:
-        self.driver = driver
-        self.by = by
+        self._driver = driver
+        self._by = by
     @logger.catch
     def click_element(self, value:str, elementname:str, log:bool = True)-> List[str]:
-        element = self.driver.find_element(self.by, value)
+        element = self._driver.find_element(self._by, value)
         element.click()
         if log:
             logger.info(f"Clicked on element {elementname}")
-        return self.driver.window_handles
+        return self._driver.window_handles
     
     @logger.catch
     def double_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
         
-        element = self.driver.find_element(self.by, value)
-        actions = ActionChains(self.driver)
+        element = self._driver.find_element(self._by, value)
+        actions = ActionChains(self._driver)
         actions.double_click(element).perform()
         
         if log:
             logger.info(f"Doubled clicked on element {elementname}")
-        return self.driver.window_handles
+        return self._driver.window_handles
     @logger.catch
     def right_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
         
-        element = self.driver.find_element(self.by, value)
-        actions = ActionChains(self.driver)
+        element = self._driver.find_element(self._by, value)
+        actions = ActionChains(self._driver)
         actions.context_click(element).perform()
         
         if log:
             logger.info(f"Right clicked on element {elementname}")
-        return self.driver.window_handles
+        return self._driver.window_handles
     @logger.catch
     def get_element_attribute(self, value:str, attribute:str, log:bool = True)->str:
-        element = self.driver.find_element(self.by, value)
+        element = self._driver.find_element(self._by, value)
         result = element.get_attribute(attribute).strip()
         if log:
             logger.info(f"Get attribute {attribute} on element, result: {result}")
@@ -85,23 +85,24 @@ class DriverAction():
     
     @logger.catch
     def input_keys(self, value:str, log:bool = True, *keys:any)->None:
-        element = self.driver.find_element(self.by, value)
+        element = self._driver.find_element(self._by, value)
         element.send_keys(*keys)
         if log:
             logger.info(f"Input text {str(*keys)} into element")
 
     @logger.catch
-    def wait_element(self, value: str, wait_time: int = 20, log: bool = True) -> None:
-        element = WebDriverWait(self.driver, wait_time).until(
-            EC.presence_of_element_located((self.by, value))
+    def wait_element(self, value: str, wait_time: int = 20, log: bool = True) -> any:
+        element = WebDriverWait(self._driver, wait_time).until(
+            EC.presence_of_element_located((self._by, value))
         )
         if log:
             logger.info(f"Wait for element {value}")
+        return element
 
     @logger.catch
     def slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
-        element = self.driver.find_element(self.by, value)
-        actions = ActionChains(self.driver)
+        element = self._driver.find_element(self._by, value)
+        actions = ActionChains(self._driver)
         actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
         if log:
             logger.info(f"Slide element by offset {offset}")
@@ -114,39 +115,39 @@ class DriverAction():
         if none of the first two are provided, the page will be scrolled to the bottom gradually
         """
         if pixel:
-            self.driver.execute_script('window.scrollBy(0,{})'.format(str(pixel)))
+            self._driver.execute_script('window.scrollBy(0,{})'.format(str(pixel)))
             if log:
                 logger.info(f"Scroll down {pixel} pixel")
             return
         elif value:
-            element = self.driver.find_element(self.by, value)
-            self.driver.execute_script("arguments[0].scrollIntoView();", element)
+            element = self._driver.find_element(self._by, value)
+            self._driver.execute_script("arguments[0].scrollIntoView();", element)
             if log:
                 logger.info(f"Scroll down to element {value}")
         else:
             js = "return action=document.body.scrollHeight"
             height = 0
-            new_height = self.driver.execute_script(js)
+            new_height = self._driver.execute_script(js)
             while height < new_height:
                 for i in range(height, new_height, 100):
-                    self.driver.execute_script('window.scrollTo(0, {})'.format(i))
+                    self._driver.execute_script('window.scrollTo(0, {})'.format(i))
                     height = new_height
                     time.sleep(sleep_time)
-                    new_height = self.driver.execute_script(js)
+                    new_height = self._driver.execute_script(js)
             if log:
                 logger.info(f"Scroll down to the bottom")
 
     @logger.catch
     def add_cookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
         if isinstance(cookieinstance, dict):
-            self.driver.add_cookie(cookieinstance)
+            self._driver.add_cookie(cookieinstance)
             if 'expiry' in cookie:
                 del cookie['expiry']
             if log:
                 logger.info(f"Added cookie: {cookieinstance}")
         elif isinstance(cookieinstance, list):
             for cookie in cookieinstance:
-                self.driver.add_cookie(cookie)
+                self._driver.add_cookie(cookie)
                 if 'expiry' in cookie:
                     del cookie['expiry']
                 if log:
@@ -160,9 +161,9 @@ class DriverAction():
         """
         for action in ActionList:
             if isinstance(action, int):
-                self.driver.switch_to.window(action)
+                self._driver.switch_to.window(action)
                 if log:
-                    logger.info(f"Switched to window {self.driver.title}")
+                    logger.info(f"Switched to window {self._driver.title}")
             else:
                 action()
         if log:
@@ -177,7 +178,7 @@ class DriverAction():
         """
         for action in ActionList:
             if isinstance(action, str):
-                self.driver.switch_to.frame(action)
+                self._driver.switch_to.frame(action)
                 if log:
                     logger.info(f"Switched to frame {action}")
             else:
@@ -218,6 +219,3 @@ class DriverAction():
 
         if all_pass:
             logger.success("Selenium driver signiture passed")
-
-
-

@@ -9,7 +9,8 @@ class SaveToolKit():
     
     @logger.catch
     @staticmethod
-    def csv_save(filename: str, item_list: Iterator[dict], encoding: str = 'utf-8', max_workers: int = 30, log: bool = True) -> None:
+    def csv_save(filename: str, item_list: Iterator[dict], encoding: str = 'utf-8', 
+                 max_workers: int = 30, log: bool = True) -> None:
         """
         Saves a list of dictionaries to a CSV file using multithreading.
 
@@ -25,7 +26,7 @@ class SaveToolKit():
         """
         lock = Lock()
 
-        def single_item(item: dict, write_headers: bool = True) -> None:
+        def _single_item(item: dict, write_headers: bool = True) -> None:
             """
             Writes a single dictionary item to the CSV file.
 
@@ -48,7 +49,7 @@ class SaveToolKit():
         first = True
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             for num, item in enumerate(item_list, start=1):
-                executor.submit(single_item, item, first)
+                executor.submit(_single_item, item, first)
                 first = False
         if log:
             logger.success(f"Inserted {num} records into {filename}.")
@@ -124,7 +125,8 @@ class SaveToolKit():
 
     @logger.catch
     @staticmethod
-    def redis_insert(redis_client: any, item_list: List[dict], key_field: str, Hash: bool = True, log: bool = True) -> None:
+    def redis_insert(redis_client: any, item_list: List[dict], key_field: str, 
+                     Hash: bool = True, log: bool = True) -> None:
         """
         Inserts a list of dictionaries into a Redis database.
 

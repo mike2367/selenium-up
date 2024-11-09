@@ -2,7 +2,7 @@ from main import logger
 from typing import List, Iterator
 from prettytable import PrettyTable
 
-table_colorplan = {
+_table_colorplan = {
     "title": "\033[95m",      # Magenta
     "header": "\033[33m",     # Blue
     "row": "\033[92m",        # Greenss
@@ -59,7 +59,7 @@ class ParseToolKits():
         """
         differences = {}
 
-        def compare(obj1, obj2, path=""):
+        def _compare(obj1, obj2, path=""):
             if type(obj1) != type(obj2):
                 differences[path] = (obj1, obj2)
             elif isinstance(obj1, dict):
@@ -73,14 +73,14 @@ class ParseToolKits():
                     elif key not in obj2:
                         differences[new_path] = (obj1[key], None)
                     else:
-                        compare(obj1[key], obj2[key], new_path)
+                        _compare(obj1[key], obj2[key], new_path)
             elif isinstance(obj1, list):
                 len1 = len(obj1)
                 len2 = len(obj2)
                 min_len = min(len1, len2)
                 for index in range(min_len):
                     new_path = f"{path}[{index}]"
-                    compare(obj1[index], obj2[index], new_path)
+                    _compare(obj1[index], obj2[index], new_path)
                 if len1 > len2:
                     for index in range(len2, len1):
                         new_path = f"{path}[{index}]"
@@ -93,23 +93,23 @@ class ParseToolKits():
                 if obj1 != obj2:
                     differences[path] = (obj1, obj2)
 
-        compare(item1, item2)
+        _compare(item1, item2)
 
         if differences:
             # Non-log version with color
             table = PrettyTable()
             if title:
-                table.title = table_colorplan["title"] + title + table_colorplan["default"]
+                table.title = _table_colorplan["title"] + title + _table_colorplan["default"]
             table.field_names = [
-                table_colorplan["header"] + "Field" + table_colorplan["default"],
-                table_colorplan["header"] + "Item1" + table_colorplan["default"],
-                table_colorplan["header"] + "Item2" + table_colorplan["default"],
+                _table_colorplan["header"] + "Field" + _table_colorplan["default"],
+                _table_colorplan["header"] + "Item1" + _table_colorplan["default"],
+                _table_colorplan["header"] + "Item2" + _table_colorplan["default"],
             ]
             for field, (val1, val2) in differences.items():
                 table.add_row([
-                    table_colorplan["row"] + field + table_colorplan["default"],
-                    table_colorplan["row"] + str(val1) + table_colorplan["default"],
-                    table_colorplan["row"] + str(val2) + table_colorplan["default"],
+                    _table_colorplan["row"] + field + _table_colorplan["default"],
+                    _table_colorplan["row"] + str(val1) + _table_colorplan["default"],
+                    _table_colorplan["row"] + str(val2) + _table_colorplan["default"],
                 ])
             print(table)
 
@@ -146,10 +146,10 @@ class ParseToolKits():
             return
         table = PrettyTable()
         if title:
-            table.title = table_colorplan["title"] + title + table_colorplan["default"]
-        table.field_names = [table_colorplan["header"] + key + table_colorplan["default"] for key in item_list[0].keys()]
+            table.title = _table_colorplan["title"] + title + _table_colorplan["default"]
+        table.field_names = [_table_colorplan["header"] + key + _table_colorplan["default"] for key in item_list[0].keys()]
         for item in item_list:
-            table.add_row([table_colorplan["row"] + str(value) + table_colorplan["default"] for value in item.values()])
+            table.add_row([_table_colorplan["row"] + str(value) + _table_colorplan["default"] for value in item.values()])
 
         print(table)
         # No color version for log

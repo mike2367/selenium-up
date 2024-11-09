@@ -3,15 +3,15 @@ from selenium import webdriver
 from main import logger
 import settings
 
-standard_option: list = [
+_standard_option: list = [
     "--incognito",
     "--disable-gpu",
     "--disable-blink-features=AutomationControlled"
 ]
 
-experimental_option: dict = {
-    "detach":True,
-    "excludeSwitches":['enable-automation', 'enable-logging']
+_experimental_option: dict = {
+    "detach": True,
+    "excludeSwitches": ['enable-automation', 'enable-logging']
 }
 
 class Driver_core():
@@ -58,18 +58,18 @@ class Driver_core():
             JavaScript code read from 'stealth.min.js' for further fingerprint elimination.
         """
         
-        self.selenium_driverType = selenium_driverType
-        self.DriverOption_param = DriverOption_param
-        self.headless = headless
-        self.opt_params = self.DriverOption_param + standard_option if self.DriverOption_param else standard_option
+        self._selenium_driverType = selenium_driverType
+        self._DriverOption_param = DriverOption_param
+        self._headless = headless
+        self._opt_params = self._DriverOption_param + _standard_option if self._DriverOption_param else _standard_option
         if headless:
-            self.opt_params.append("--headless")
+            self._opt_params.append("--headless")
         # avoid repeated settings
-        self.opt_params = list(set(self.opt_params))
+        self._opt_params = list(set(self._opt_params))
 
         # for fingerprint elimination
-        self.script_func = 'Page.addScriptToEvaluateOnNewDocument'
-        self.CHR_mem_js = """
+        self._script_func = 'Page.addScriptToEvaluateOnNewDocument'
+        self._CHR_mem_js = """
            Object.defineProperty(navigator, 'deviceMemory', {
                  get: () => 8
            });
@@ -78,16 +78,17 @@ class Driver_core():
            });
             """
         with open('./resources/stealth.min.js', 'r') as f:
-            self.stealth_js = f.read()
+            self._stealth_js = f.read()
         f.close()
+        return self._driver_instance()
 
     def __repr__(self) -> str:
         return f"""
-            WebDriver:{self.selenium_driverType}
-            DriverOptions:{self.opt_params}"""
+            WebDriver:{self._selenium_driverType}
+            DriverOptions:{self._opt_params}"""
 
     @logger.catch
-    def driver_instance(self):
+    def _driver_instance(self):
         """
         Initializes and returns a Selenium WebDriver instance based on the specified browser type.
 
@@ -97,35 +98,34 @@ class Driver_core():
         Returns:
             WebDriver: A configured Selenium WebDriver instance for the specified browser type.
         """
-        if self.selenium_driverType == 'Chrome':
+        if self._selenium_driverType == 'Chrome':
             options = webdriver.ChromeOptions()
             # config your own binary loc in settings
             options.binary_location = settings.CHROMIUM
-            for item in self.opt_params:
+            for item in self._opt_params:
                 options.add_argument(item)
-            for opt in experimental_option:
-                options.add_experimental_option(opt, experimental_option[opt])
+            for opt in _experimental_option:
+                options.add_experimental_option(opt, _experimental_option[opt])
             driver = webdriver.Chrome(options=options)
 
 
-        elif self.selenium_driverType == 'Firefox':
+        elif self._selenium_driverType == 'Firefox':
             options = webdriver.FirefoxOptions()
             # config your own binary loc in settings
             options.binary_location = settings.FIREFOX
-            for item in self.opt_params:
+            for item in self._opt_params:
                 options.add_argument(item)
-            for opt in experimental_option:
-                options.add_experimental_option(opt, experimental_option[opt])
+            for opt in _experimental_option:
+                options.add_experimental_option(opt, _experimental_option[opt])
             driver = webdriver.Firefox(options=options)
 
         if driver:
-            driver.execute_cdp_cmd(self.script_func, {'source': self.stealth_js})
+            driver.execute_cdp_cmd(self._script_func, {'source': self._stealth_js})
             # To deal with CHR memory fail
-            driver.execute_cdp_cmd(self.script_func, {
-                "source": self.CHR_mem_js
+            driver.execute_cdp_cmd(self._script_func, {
+                "source": self._CHR_mem_js
                 })
 
             logger.success("Selenium driver successfully initialized")
         return driver
 
-    

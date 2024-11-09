@@ -4,7 +4,7 @@ from Log import Customized_Log
 current_directory = os.path.dirname(os.path.abspath(__file__))
 os.chdir(current_directory)
 
-param = {}
+_param = {}
 """
     email contact param format:{
         "username": "you@gmail.com",
@@ -12,9 +12,9 @@ param = {}
         "to": "test@gmail.com"
     }
 """
-logger_instance = Customized_Log()
-logger_instance.level_setting()
-logger = logger_instance.log_setting(contact_param=param)
+logger = Customized_Log(contact_param=_param)
+logger.set_new_terminal_level()
+
 
 
     
