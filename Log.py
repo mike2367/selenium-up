@@ -2,13 +2,18 @@ from loguru import logger
 import yagmail
 import sys
 from typing import Union
-class Customized_Log:
+class Customized_Log(object):
+    def __new__(cls, *args, **kwargs):
+        instance = super(Customized_Log, cls).__new__(cls)
+        instance.__init__(*args, **kwargs)
+        return instance.custom_logger
     def __init__(self, filepath: str = "./Log.log",
                      rotation: str = "00:00",
                      level: str = "DEBUG",
                      Format: str = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
                      email_level: str = None,
-                     contact_param: Union[dict, None] = None
+                     contact_param: Union[dict, None] = None,
+                     new_terminal_level: str = "ERROR"
                      ) -> None:
         """
         Initialize the Customized_Log class and set up the logger.
@@ -24,7 +29,8 @@ class Customized_Log:
         self.custom_logger = logger
         self.custom_logger.add(filepath, rotation=rotation, level=level, format=Format)
         self._email_setting(email_level, contact_param)
-        return self.custom_logger
+        self._set_new_terminal_level(new_terminal_level)
+
     def _email_setting(self, level:str = "ERROR", param:Union[dict, None] = None) -> None:
         """
         Send email to the contact specified in the 'contact_param' dictionary once an error occurs.
@@ -51,10 +57,10 @@ class Customized_Log:
             except Exception as e:
                 logger.error(f"Failed to set up email handler: {e}")
 
-    def set_new_terminal_level(self, level:str="ERROR") -> None:
+    def _set_new_terminal_level(self, level:str="ERROR") -> None:
         """
         Add a new terminal for higher level log processing
         """
-        self.logger.add(sys.stdout, level=level)
+        self.custom_logger.add(sys.stdout, level=level)
 
     

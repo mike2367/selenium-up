@@ -1,5 +1,5 @@
 from main import logger
-from Connection import Driver_core
+from Connection import Driver_init
 from DriverAction import DriverAction, By
 from SaveAction import SaveToolKit
 from ParseToolkits import ParseToolKits
@@ -11,7 +11,7 @@ class Workflow(ABC):
     def __init__(self, by:By, urls: Union[str, List[str]], *params:any) -> None:
         
         super().__init__()
-        self.driver = Driver_core(*params).driver_instance()
+        self.driver = Driver_init(*params).driver_instance()
         self.by = by
         self.driver_action = DriverAction(self.driver, self.by)
         self.urls = urls

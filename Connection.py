@@ -14,7 +14,7 @@ _experimental_option: dict = {
     "excludeSwitches": ['enable-automation', 'enable-logging']
 }
 
-class Driver_core():
+class _Driver_core():
     def __init__(self, 
         selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
         DriverOption_param: Union[None, list] = None,
@@ -58,17 +58,17 @@ class Driver_core():
             JavaScript code read from 'stealth.min.js' for further fingerprint elimination.
         """
         
-        self._selenium_driverType = selenium_driverType
-        self._DriverOption_param = DriverOption_param
-        self._headless = headless
-        self._opt_params = self._DriverOption_param + _standard_option if self._DriverOption_param else _standard_option
+        self.selenium_driverType = selenium_driverType
+        self.DriverOption_param = DriverOption_param
+        self.headless = headless
+        self.opt_params = self.DriverOption_param + _standard_option if self.DriverOption_param else _standard_option
         if headless:
-            self._opt_params.append("--headless")
+            self.opt_params.append("--headless")
         # avoid repeated settings
-        self._opt_params = list(set(self._opt_params))
+        self.opt_params = list(set(self.opt_params))
 
         # for fingerprint elimination
-        self._script_func = 'Page.addScriptToEvaluateOnNewDocument'
+        self.script_func = 'Page.addScriptToEvaluateOnNewDocument'
         self._CHR_mem_js = """
            Object.defineProperty(navigator, 'deviceMemory', {
                  get: () => 8
@@ -78,14 +78,35 @@ class Driver_core():
            });
             """
         with open('./resources/stealth.min.js', 'r') as f:
-            self._stealth_js = f.read()
+            self.stealth_js = f.read()
         f.close()
-        return self._driver_instance()
 
     def __repr__(self) -> str:
-        return f"""
-            WebDriver:{self._selenium_driverType}
-            DriverOptions:{self._opt_params}"""
+        print("-" * 100)
+        driver_info = """
+            WebDriver:{self.selenium_driverType}
+            DriverOptions:{self.opt_params}"""
+        logger.info(f"Driver info: {driver_info}")
+        return "-" * 100
+
+   
+
+class Driver_init(object):
+    def __new__(cls, *args, **kwargs):
+        instance = super(Driver_init, cls).__new__(cls)
+        instance.__init__(*args, **kwargs)
+        return instance._driver_instance()
+    def __init__(self, 
+        selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
+        DriverOption_param: Union[None, list] = None,
+        headless: bool = False,    
+    ) -> None:
+        self._driver_core = _Driver_core(selenium_driverType, DriverOption_param, headless)
+        self._selenium_driverType = self._driver_core.selenium_driverType
+        self._opt_params = self._driver_core.opt_params
+        self._script_func = self._driver_core.script_func
+        self._CHR_mem_js = self._driver_core._CHR_mem_js
+        self._stealth_js = self._driver_core.stealth_js
 
     @logger.catch
     def _driver_instance(self):
@@ -115,17 +136,20 @@ class Driver_core():
             options.binary_location = settings.FIREFOX
             for item in self._opt_params:
                 options.add_argument(item)
-            for opt in _experimental_option:
-                options.add_experimental_option(opt, _experimental_option[opt])
             driver = webdriver.Firefox(options=options)
 
         if driver:
             driver.execute_cdp_cmd(self._script_func, {'source': self._stealth_js})
             # To deal with CHR memory fail
-            driver.execute_cdp_cmd(self._script_func, {
-                "source": self._CHR_mem_js
-                })
+            driver.execute_cdp_cmd(self._script_func, {"source": self._CHR_mem_js})
 
             logger.success("Selenium driver successfully initialized")
+            print(self._driver_core)
         return driver
+    
 
+    def __repr__(self) -> str:
+        return self._driver_core.__repr__()
+    
+
+driver = Driver_init()

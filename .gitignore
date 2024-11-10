@@ -6,6 +6,6 @@ firefox/
 # End Generation Here
 ```
 
-Log.log
+*.log
 
 __pycache__/

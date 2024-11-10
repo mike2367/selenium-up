@@ -13,7 +13,7 @@ _param = {}
     }
 """
 logger = Customized_Log(contact_param=_param)
-logger.set_new_terminal_level()
+
 
 
 
