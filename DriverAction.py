@@ -1,14 +1,43 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from typing import Union, List
+from typing import Union, List, Callable
 from main import logger
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException as NSE
+from functools import wraps
 import random
 import time
 
+def wait_element_decorator(func: Callable) -> Callable:
+        """
+        Decorator to wait for a web element before executing the function.
 
+        Parameters:
+        -----------
+        func : Callable
+            The function to be decorated.
+
+        Returns:
+        --------
+        Callable
+            The wrapped function with element waiting logic.
+        """
+        @wraps(func)
+        def wrapper(self, value: str, *args, wait_time: int = 20, log: bool = False, **kwargs):
+            try:
+                element = WebDriverWait(self._driver, wait_time).until(
+                    EC.presence_of_element_located((self._by, value))
+                )
+                if not element:
+                    raise NSE("Input element not found, please check By and make sure it is loaded correctly")
+                if log:
+                    logger.info(f"Waited for element {value}")
+            except Exception as e:
+                logger.error(f"Error waiting for element {value}: {e}")
+                raise
+            return func(self, value, *args, log=log, **kwargs)
+        return wrapper
 class DriverAction():
     """
     A class to perform various actions on web elements using Selenium WebDriver.
@@ -50,18 +79,20 @@ class DriverAction():
     def __init__(self, driver, by: By) -> None:
         self._driver = driver
         self._by = by
+    
+
+    @wait_element_decorator
     @logger.catch
-    def click_element(self, value:str, elementname:str, log:bool = True, wait_time:int = 20)-> List[str]:
-        self.wait_element(value, wait_time)
+    def click_element(self, value:str, elementname:str, log:bool = True, wait_time:int = 20) -> List[str]:
         element = self._driver.find_element(self._by, value)
         element.click()
         if log:
             logger.info(f"Clicked on element {elementname}")
         return self._driver.window_handles
     
+    @wait_element_decorator
     @logger.catch
     def double_click(self, value: str, elementname: str, log:bool = True, wait_time:int = 20) -> List[str]:
-        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
         actions = ActionChains(self._driver)
         actions.double_click(element).perform()
@@ -69,9 +100,10 @@ class DriverAction():
         if log:
             logger.info(f"Doubled clicked on element {elementname}")
         return self._driver.window_handles
+
+    @wait_element_decorator
     @logger.catch
     def right_click(self, value: str, elementname: str, log:bool = True, wait_time:int = 20) -> List[str]:
-        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
         actions = ActionChains(self._driver)
         actions.context_click(element).perform()
@@ -79,18 +111,19 @@ class DriverAction():
         if log:
             logger.info(f"Right clicked on element {elementname}")
         return self._driver.window_handles
+
+    @wait_element_decorator
     @logger.catch
-    def get_element_attribute(self, value:str, attribute:str, log:bool = True, wait_time:int = 20)->str:
-        self.wait_element(value, wait_time)
+    def get_element_attribute(self, value:str, attribute:str, log:bool = True, wait_time:int = 20) -> str:
         element = self._driver.find_element(self._by, value)
         result = element.get_attribute(attribute).strip()
         if log:
             logger.info(f"Get attribute {attribute} on element, result: {result}")
         return result
     
+    @wait_element_decorator
     @logger.catch
-    def input_keys(self, value:str, *keys:any, log:bool = True, wait_time:int = 20)->None:
-        self.wait_element(value, wait_time)
+    def input_keys(self, value:str, *keys:any, log:bool = True, wait_time:int = 20) -> None:
         element = self._driver.find_element(self._by, value)
         element.send_keys(*keys)
         if log:
@@ -107,16 +140,17 @@ class DriverAction():
             logger.info(f"Wait for element {value}")
         return element
 
+    @wait_element_decorator
     @logger.catch
     def slide_horizontal(self, value: str, offset: int, log: bool = True, wait_time:int = 20) -> None:
-        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
         actions = ActionChains(self._driver)
         actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
         if log:
             logger.info(f"Slide element by offset {offset}")
+
     @logger.catch
-    def scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True)->None:
+    def scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True) -> None:
         """
         value: a By expression for element search, then driver will scroll until it is in view
         pixel: how many pixel to scroll down
@@ -152,8 +186,8 @@ class DriverAction():
     def add_cookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
         if isinstance(cookieinstance, dict):
             self._driver.add_cookie(cookieinstance)
-            if 'expiry' in cookie:
-                del cookie['expiry']
+            if 'expiry' in cookieinstance:
+                del cookieinstance['expiry']
             if log:
                 logger.info(f"Added cookie: {cookieinstance}")
         elif isinstance(cookieinstance, list):
@@ -163,30 +197,30 @@ class DriverAction():
                     del cookie['expiry']
                 if log:
                     logger.info(f"Added cookie: {cookie}")
+    
     @logger.catch
-    def window_switch(self, ActionList:List[Union[int, callable]], log:bool = True)->None:
+    def window_switch(self, ActionList: List[Union[int, Callable]], log: bool = True) -> None:
         """
         This function works as a second layer for abstract workflow,
         packing up a chain of action in ActionList for execution.
         An action can be a window index or a function for taking element etc.
         """
         for action in ActionList:
-                if isinstance(action, int):
-                    self._driver.switch_to.window(action)
-                    if log:
-                        logger.info(f"Switched to window {self._driver.title}")
-                elif isinstance(action, tuple):
-                    func, args, kwargs = action
-                    try:
-                        func(*args, **kwargs)
-                    except Exception as e:
-                        logger.error(f"Failed to execute {func.__name__} with args {args} and kwargs {kwargs}: {e}")
-                else:
-                    raise ValueError("ActionList items must be either int or tuple(func, args, kwargs)")
+            if isinstance(action, int):
+                self._driver.switch_to.window(action)
+                if log:
+                    logger.info(f"Switched to window {self._driver.title}")
+            elif isinstance(action, tuple):
+                func, args, kwargs = action
+                try:
+                    func(*args, **kwargs)
+                except Exception as e:
+                    logger.error(f"Failed to execute {func.__name__} with args {args} and kwargs {kwargs}: {e}")
+            else:
+                raise ValueError("ActionList items must be either int or tuple(func, args, kwargs)")
         if log:
             logger.info("Window switch completed")
 
-    @logger.catch
     @logger.catch
     def frame_switch(self, ActionList: List[Union[str, tuple]], log: bool = True) -> None:
         """
@@ -213,7 +247,6 @@ class DriverAction():
         if log:
             logger.info("Frame switch completed")
 
-    
     @staticmethod
     @logger.catch
     def driver_signiture_validate(driver):
