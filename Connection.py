@@ -77,6 +77,11 @@ class _Driver_core():
              get: () => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
            });
             """
+        self._undefined_js = """
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                    })
+                """
         with open('./resources/stealth.min.js', 'r') as f:
             self.stealth_js = f.read()
         f.close()
@@ -108,6 +113,20 @@ class Driver_init(object):
         self._CHR_mem_js = self._driver_core._CHR_mem_js
         self._stealth_js = self._driver_core.stealth_js
 
+
+    """
+    This function is explictly used for non-chrome browser to eliminate driver signiture
+    and is required to be executed every time close to the validation
+    """
+    @logger.catch
+    @staticmethod
+    def insert_undefined_js(driver:any)->None:
+        undefined_js = """
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                    })
+                """
+        driver.execute_script(undefined_js)
     @logger.catch
     def _driver_instance(self):
         """
@@ -128,6 +147,12 @@ class Driver_init(object):
             for opt in _experimental_option:
                 options.add_experimental_option(opt, _experimental_option[opt])
             driver = webdriver.Chrome(options=options)
+            if driver:
+                driver.execute_cdp_cmd(self._script_func, {'source': self._stealth_js})
+                driver.execute_cdp_cmd(self._script_func, {"source": self._undefined_js})
+                # To deal with CHR memory fail
+                driver.execute_cdp_cmd(self._script_func, {"source": self._CHR_mem_js})
+                
 
 
         elif self._selenium_driverType == 'Firefox':
@@ -138,11 +163,8 @@ class Driver_init(object):
                 options.add_argument(item)
             driver = webdriver.Firefox(options=options)
 
-        if driver:
-            driver.execute_cdp_cmd(self._script_func, {'source': self._stealth_js})
-            # To deal with CHR memory fail
-            driver.execute_cdp_cmd(self._script_func, {"source": self._CHR_mem_js})
 
+        if driver:
             logger.success("Selenium driver successfully initialized")
             print(self._driver_core)
         return driver
@@ -152,4 +174,3 @@ class Driver_init(object):
         return self._driver_core.__repr__()
     
 
-driver = Driver_init()

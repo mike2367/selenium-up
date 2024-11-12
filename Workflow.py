@@ -1,14 +1,12 @@
 from main import logger
 from Connection import Driver_init
 from DriverAction import DriverAction, By
-from SaveAction import SaveToolKit
-from ParseToolkits import ParseToolKits
 from abc import ABC, abstractmethod
 from typing import Union, List
 
 
 class Workflow(ABC):
-    def __init__(self, by:By, urls: Union[str, List[str]], *params:any) -> None:
+    def __init__(self, urls: Union[str, List[str]], by:By = By.XPATH, *params:any) -> None:
         
         super().__init__()
         self.driver = Driver_init(*params).driver_instance()

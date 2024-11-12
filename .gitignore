@@ -9,3 +9,5 @@ firefox/
 *.log
 
 __pycache__/
+
+local_test.py

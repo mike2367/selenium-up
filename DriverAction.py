@@ -233,3 +233,4 @@ class DriverAction():
                 logger.warning(f"Selenium driver signiture test failed in: {tr.text}, type: {td.text}")
         if all_pass:
             logger.success("Selenium driver signiture passed")
+
