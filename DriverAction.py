@@ -4,8 +4,11 @@ from typing import Union, List
 from main import logger
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException as NSE
 import random
 import time
+
+
 class DriverAction():
     """
     A class to perform various actions on web elements using Selenium WebDriver.
@@ -50,6 +53,8 @@ class DriverAction():
     @logger.catch
     def click_element(self, value:str, elementname:str, log:bool = True)-> List[str]:
         element = self._driver.find_element(self._by, value)
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         element.click()
         if log:
             logger.info(f"Clicked on element {elementname}")
@@ -59,6 +64,8 @@ class DriverAction():
     def double_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
         
         element = self._driver.find_element(self._by, value)
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         actions = ActionChains(self._driver)
         actions.double_click(element).perform()
         
@@ -69,6 +76,8 @@ class DriverAction():
     def right_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
         
         element = self._driver.find_element(self._by, value)
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         actions = ActionChains(self._driver)
         actions.context_click(element).perform()
         
@@ -78,14 +87,18 @@ class DriverAction():
     @logger.catch
     def get_element_attribute(self, value:str, attribute:str, log:bool = True)->str:
         element = self._driver.find_element(self._by, value)
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         result = element.get_attribute(attribute).strip()
         if log:
             logger.info(f"Get attribute {attribute} on element, result: {result}")
         return result
     
     @logger.catch
-    def input_keys(self, value:str, log:bool = True, *keys:any)->None:
+    def input_keys(self, value:str, *keys:any, log:bool = True)->None:
         element = self._driver.find_element(self._by, value)
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         element.send_keys(*keys)
         if log:
             logger.info(f"Input text {str(*keys)} into element")
@@ -102,6 +115,8 @@ class DriverAction():
     @logger.catch
     def slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
         element = self._driver.find_element(self._by, value)
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         actions = ActionChains(self._driver)
         actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
         if log:
@@ -121,6 +136,8 @@ class DriverAction():
             return
         elif value:
             element = self._driver.find_element(self._by, value)
+            if not element:
+                raise NSE("Input element not found, please check By and make sure it is loaded correctly")
             self._driver.execute_script("arguments[0].scrollIntoView();", element)
             if log:
                 logger.info(f"Scroll down to element {value}")
@@ -233,4 +250,5 @@ class DriverAction():
                 logger.warning(f"Selenium driver signiture test failed in: {tr.text}, type: {td.text}")
         if all_pass:
             logger.success("Selenium driver signiture passed")
+
 

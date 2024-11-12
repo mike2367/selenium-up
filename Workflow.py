@@ -6,10 +6,10 @@ from typing import Union, List
 
 
 class Workflow(ABC):
-    def __init__(self, urls: Union[str, List[str]], by:By = By.XPATH, *params:any) -> None:
+    def __init__(self, urls: Union[str, List[str]], by:By = By.XPATH, *driver_params:any) -> None:
         
         super().__init__()
-        self.driver = Driver_init(*params).driver_instance()
+        self.driver = Driver_init(*driver_params)
         self.by = by
         self.driver_action = DriverAction(self.driver, self.by)
         self.urls = urls

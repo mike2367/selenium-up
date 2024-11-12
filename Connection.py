@@ -69,7 +69,7 @@ class _Driver_core():
 
         # for fingerprint elimination
         self.script_func = 'Page.addScriptToEvaluateOnNewDocument'
-        self._CHR_mem_js = """
+        self.CHR_mem_js = """
            Object.defineProperty(navigator, 'deviceMemory', {
                  get: () => 8
            });
@@ -77,7 +77,7 @@ class _Driver_core():
              get: () => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
            });
             """
-        self._undefined_js = """
+        self.undefined_js = """
                 Object.defineProperty(navigator, 'webdriver', {
                     get: () => undefined
                     })
@@ -110,8 +110,9 @@ class Driver_init(object):
         self._selenium_driverType = self._driver_core.selenium_driverType
         self._opt_params = self._driver_core.opt_params
         self._script_func = self._driver_core.script_func
-        self._CHR_mem_js = self._driver_core._CHR_mem_js
+        self._CHR_mem_js = self._driver_core.CHR_mem_js
         self._stealth_js = self._driver_core.stealth_js
+        self._undefined_js = self._driver_core.undefined_js
 
 
     """
