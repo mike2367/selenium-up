@@ -51,21 +51,18 @@ class DriverAction():
         self._driver = driver
         self._by = by
     @logger.catch
-    def click_element(self, value:str, elementname:str, log:bool = True)-> List[str]:
+    def click_element(self, value:str, elementname:str, log:bool = True, wait_time:int = 20)-> List[str]:
+        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
-        if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         element.click()
         if log:
             logger.info(f"Clicked on element {elementname}")
         return self._driver.window_handles
     
     @logger.catch
-    def double_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
-        
+    def double_click(self, value: str, elementname: str, log:bool = True, wait_time:int = 20) -> List[str]:
+        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
-        if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         actions = ActionChains(self._driver)
         actions.double_click(element).perform()
         
@@ -73,11 +70,9 @@ class DriverAction():
             logger.info(f"Doubled clicked on element {elementname}")
         return self._driver.window_handles
     @logger.catch
-    def right_click(self, value: str, elementname: str, log:bool = True) -> List[str]:
-        
+    def right_click(self, value: str, elementname: str, log:bool = True, wait_time:int = 20) -> List[str]:
+        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
-        if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         actions = ActionChains(self._driver)
         actions.context_click(element).perform()
         
@@ -85,38 +80,37 @@ class DriverAction():
             logger.info(f"Right clicked on element {elementname}")
         return self._driver.window_handles
     @logger.catch
-    def get_element_attribute(self, value:str, attribute:str, log:bool = True)->str:
+    def get_element_attribute(self, value:str, attribute:str, log:bool = True, wait_time:int = 20)->str:
+        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
-        if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         result = element.get_attribute(attribute).strip()
         if log:
             logger.info(f"Get attribute {attribute} on element, result: {result}")
         return result
     
     @logger.catch
-    def input_keys(self, value:str, *keys:any, log:bool = True)->None:
+    def input_keys(self, value:str, *keys:any, log:bool = True, wait_time:int = 20)->None:
+        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
-        if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         element.send_keys(*keys)
         if log:
             logger.info(f"Input text {str(*keys)} into element")
 
     @logger.catch
-    def wait_element(self, value: str, wait_time: int = 20, log: bool = True) -> any:
+    def wait_element(self, value: str, wait_time: int = 20, log: bool = False) -> any:
         element = WebDriverWait(self._driver, wait_time).until(
             EC.presence_of_element_located((self._by, value))
         )
+        if not element:
+            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         if log:
             logger.info(f"Wait for element {value}")
         return element
 
     @logger.catch
-    def slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
+    def slide_horizontal(self, value: str, offset: int, log: bool = True, wait_time:int = 20) -> None:
+        self.wait_element(value, wait_time)
         element = self._driver.find_element(self._by, value)
-        if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         actions = ActionChains(self._driver)
         actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
         if log:
