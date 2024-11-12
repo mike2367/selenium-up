@@ -160,32 +160,47 @@ class DriverAction():
         An action can be a window index or a function for taking element etc.
         """
         for action in ActionList:
-            if isinstance(action, int):
-                self._driver.switch_to.window(action)
-                if log:
-                    logger.info(f"Switched to window {self._driver.title}")
-            else:
-                action()
+                if isinstance(action, int):
+                    self._driver.switch_to.window(action)
+                    if log:
+                        logger.info(f"Switched to window {self._driver.title}")
+                elif isinstance(action, tuple):
+                    func, args, kwargs = action
+                    try:
+                        func(*args, **kwargs)
+                    except Exception as e:
+                        logger.error(f"Failed to execute {func.__name__} with args {args} and kwargs {kwargs}: {e}")
+                else:
+                    raise ValueError("ActionList items must be either int or tuple(func, args, kwargs)")
         if log:
-            logger.info(f"window switch completed")
+            logger.info("Window switch completed")
 
     @logger.catch
-    def frame_switch(self, ActionList:List[Union[str, callable]], log:bool = True)->None:
+    @logger.catch
+    def frame_switch(self, ActionList: List[Union[str, tuple]], log: bool = True) -> None:
         """
         This function works as a second layer for abstract workflow,
-        packing up a chain of action in ActionList for execution.
-        An action can be a frame name or a function for taking element etc.
+        packing up a chain of actions in ActionList for execution.
+        An action can be a frame name or a tuple containing a function and its arguments.
         """
         for action in ActionList:
             if isinstance(action, str):
                 self._driver.switch_to.frame(action)
                 if log:
                     logger.info(f"Switched to frame {action}")
+            elif isinstance(action, tuple):
+                if len(action) != 3:
+                    logger.error("Tuple actions must be in the format (func, args, kwargs)")
+                    continue
+                func, args, kwargs = action
+                try:
+                    func(*args, **kwargs)
+                except Exception as e:
+                    logger.error(f"Failed to execute {func.__name__} with args {args} and kwargs {kwargs}: {e}")
             else:
-                action()
-
+                raise ValueError("ActionList items must be either str or tuple(func, args, kwargs)")
         if log:
-            logger.info(f"frame switch completed")
+            logger.info("Frame switch completed")
 
     
     @staticmethod
@@ -216,6 +231,5 @@ class DriverAction():
                 all_pass = False
                 tr = driver.find_element(by=By.XPATH, value='//*[@id="fp2"]/tr[{}]/td[1]'.format(tds.index(td) + 1))
                 logger.warning(f"Selenium driver signiture test failed in: {tr.text}, type: {td.text}")
-
         if all_pass:
             logger.success("Selenium driver signiture passed")
