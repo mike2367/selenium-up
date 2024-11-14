@@ -10,34 +10,36 @@ import random
 import time
 
 def wait_element_decorator(func: Callable) -> Callable:
-        """
-        Decorator to wait for a web element before executing the function.
+    """
+    Decorator to wait for a web element before executing the function.
 
-        Parameters:
-        -----------
-        func : Callable
-            The function to be decorated.
+    Parameters:
+    -----------
+    func : Callable
+        The function to be decorated.
 
-        Returns:
-        --------
-        Callable
-            The wrapped function with element waiting logic.
-        """
-        @wraps(func)
-        def wrapper(self, value: str, *args, wait_time: int = 20, log: bool = False, **kwargs):
-            try:
-                element = WebDriverWait(self._driver, wait_time).until(
-                    EC.presence_of_element_located((self._by, value))
-                )
-                if not element:
-                    raise NSE("Input element not found, please check By and make sure it is loaded correctly")
-                if log:
-                    logger.info(f"Waited for element {value}")
-            except Exception as e:
-                logger.error(f"Error waiting for element {value}: {e}")
-                raise
-            return func(self, value, *args, log=log, **kwargs)
-        return wrapper
+    Returns:
+    --------
+    Callable
+        The wrapped function with element waiting logic.
+    """
+    @wraps(func)
+    def wrapper(self, value: str, *args, wait_time: int = 20, _decorator_log: bool = False, by: By = None, **kwargs):
+        by = self._by if by is None else by
+        try:
+            element = WebDriverWait(self._driver, wait_time).until(
+                EC.presence_of_element_located((by, value))
+            )
+            if not element:
+                raise NSE("Input element not found, please check By and make sure it is loaded correctly")
+            if _decorator_log:
+                logger.debug(f"Waited for element {value}")
+        except Exception as e:
+            logger.error(f"Error waiting for element {value}: {e}")
+            raise
+        return func(self, value, *args, log=kwargs.get('log', True), by=by, **kwargs)
+    return wrapper
+
 class DriverAction():
     """
     A class to perform various actions on web elements using Selenium WebDriver.
@@ -54,25 +56,25 @@ class DriverAction():
     click_element(value: str, elementname: str, log: bool = True) -> List[str]:
         Clicks on a web element and logs the action.
 
-    double_click(value: str, elementname: str, log: bool = True) -> List[str]:
+    double_click(value: str, elementname: str, log: bool = True, by: By = None) -> List[str]:
         Double-clicks on a web element and logs the action.
 
-    right_click(value: str, elementname: str, log: bool = True) -> List[str]:
+    right_click(value: str, elementname: str, log: bool = True, by: By = None) -> List[str]:
         Right-clicks on a web element and logs the action.
 
-    get_element_attribute(value: str, attribute: str, log: bool = True) -> str:
+    get_element_attribute(value: str, attribute: str, log: bool = True, by: By = None) -> str:
         Retrieves the value of a specified attribute from a web element and logs the action.
 
-    input_keys(value: str, log: bool = True, *keys: any) -> None:
+    input_keys(value: str, log: bool = True, *keys: any, by: By = None) -> None:
         Sends keys to a web element and logs the action.
 
-    wait_element(value: str, wait_time: int = 20, log: bool = True) -> None:
+    wait_element(value: str, wait_time: int = 20, log: bool = True, by: By = None) -> None:
         Waits for a web element to be present on the web page and logs the action.
         
-    slide_horizontal(self, value: str, offset: int, log: bool = True) -> None:
+    slide_horizontal(self, value: str, offset: int, log: bool = True, by: By = None, slowly:bool = True) -> None:
         Slides a web element horizontally by a specified offset and logs the action.
     
-    scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True)->None:
+    scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True, by: By = None)->None:
         Scrolls the web page down and logs the action.
     """
 
@@ -83,105 +85,164 @@ class DriverAction():
 
     @wait_element_decorator
     @logger.catch
-    def click_element(self, value:str, elementname:str, log:bool = True, wait_time:int = 20) -> List[str]:
-        element = self._driver.find_element(self._by, value)
+    def click_element(self, value:str, elementname:str, log:bool = True, by: By = None) -> List[str]:
+        by = self._by if by is None else by
+        element = self._driver.find_element(by, value)
         element.click()
         if log:
-            logger.info(f"Clicked on element {elementname}")
+            logger.debug(f"Clicked on element {elementname}")
         return self._driver.window_handles
     
     @wait_element_decorator
     @logger.catch
-    def double_click(self, value: str, elementname: str, log:bool = True, wait_time:int = 20) -> List[str]:
-        element = self._driver.find_element(self._by, value)
+    def double_click(self, value: str, elementname: str, log:bool = True, by: By = None) -> List[str]:
+        by = self._by if by is None else by
+        element = self._driver.find_element(by, value)
         actions = ActionChains(self._driver)
         actions.double_click(element).perform()
         
         if log:
-            logger.info(f"Doubled clicked on element {elementname}")
+            logger.debug(f"Doubled clicked on element {elementname}")
         return self._driver.window_handles
 
     @wait_element_decorator
     @logger.catch
-    def right_click(self, value: str, elementname: str, log:bool = True, wait_time:int = 20) -> List[str]:
-        element = self._driver.find_element(self._by, value)
+    def right_click(self, value: str, elementname: str, log:bool = True, by: By = None) -> List[str]:
+        by = self._by if by is None else by
+        element = self._driver.find_element(by, value)
         actions = ActionChains(self._driver)
         actions.context_click(element).perform()
         
         if log:
-            logger.info(f"Right clicked on element {elementname}")
+            logger.debug(f"Right clicked on element {elementname}")
         return self._driver.window_handles
 
     @wait_element_decorator
     @logger.catch
-    def get_element_attribute(self, value:str, attribute:str, log:bool = True, wait_time:int = 20) -> str:
-        element = self._driver.find_element(self._by, value)
+    def get_element_attribute(self, value:str, attribute:str, log:bool = True, by: By = None) -> str:
+        by = self._by if by is None else by
+        element = self._driver.find_element(by, value)
         result = element.get_attribute(attribute).strip()
         if log:
-            logger.info(f"Get attribute {attribute} on element, result: {result}")
+            logger.debug(f"Get attribute {attribute} on element, result: {result}")
         return result
     
     @wait_element_decorator
     @logger.catch
-    def input_keys(self, value:str, *keys:any, log:bool = True, wait_time:int = 20) -> None:
-        element = self._driver.find_element(self._by, value)
+    def input_keys(self, value:str, *keys:any, log:bool = True, by: By = None) -> None:
+        by = self._by if by is None else by
+        element = self._driver.find_element(by, value)
         element.send_keys(*keys)
         if log:
-            logger.info(f"Input text {str(*keys)} into element")
+            logger.debug(f"Input text {str(*keys)} into element{value}")
 
     @logger.catch
-    def wait_element(self, value: str, wait_time: int = 20, log: bool = False) -> any:
+    def wait_element(self, value: str, wait_time: int = 20, log: bool = False, by: By = None) -> any:
+        by = self._by if by is None else by
         element = WebDriverWait(self._driver, wait_time).until(
-            EC.presence_of_element_located((self._by, value))
+            EC.presence_of_element_located((by, value))
         )
         if not element:
             raise NSE("Input element not found, please check By and make sure it is loaded correctly")
         if log:
-            logger.info(f"Wait for element {value}")
+            logger.debug(f"Wait for element {value}")
         return element
 
     @wait_element_decorator
     @logger.catch
-    def slide_horizontal(self, value: str, offset: int, log: bool = True, wait_time:int = 20) -> None:
-        element = self._driver.find_element(self._by, value)
+    def slide_horizontal(self, value: str, offset: int, log: bool = True, by: By = None, slowly: bool = True, slow_step:int = 10, slow_wait:float = 0.01) -> None:
+        by = self._by if by is None else by
+        element = self._driver.find_element(by, value)
         actions = ActionChains(self._driver)
-        actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
+        if not slowly:
+            actions.click_and_hold(element).move_by_offset(offset, 0).release().perform()
+        else:
+            # move slowly
+            actions.click_and_hold(element)
+            i = 0
+            step = slow_step 
+            while i < offset:
+                time.sleep(slow_wait)
+                move_step = step if (offset - i) >= step else (offset - i)
+                actions.move_by_offset(move_step, 0).perform()
+                i += move_step
+            actions.release().perform() 
+
         if log:
-            logger.info(f"Slide element by offset {offset}")
+            logger.debug(f"Slide element {value} by offset {offset}")
+
 
     @logger.catch
-    def scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True) -> None:
+    def scroll_down(self, value:str = None, pixel:int = None, sleep_time:float = random.uniform(0.5, 1), log:bool = True, by: By = None, slowly: bool = True, slow_step:int = 100) -> None:
         """
         value: a By expression for element search, then driver will scroll until it is in view
         pixel: how many pixel to scroll down
 
         if none of the first two are provided, the page will be scrolled to the bottom gradually
         """
+        by = self._by if by is None else by
         if pixel:
-            self._driver.execute_script('window.scrollBy(0,{})'.format(str(pixel)))
+            """
+            this option is rarely used and required to wait until the loading finishes
+            """
+            time.sleep(sleep_time * 4) # not optimal, change on condition
+            if slowly:
+                    for i in range(0, pixel, slow_step):
+                        scroll_amount = slow_step if (pixel - i) >= slow_step else pixel - i
+                        self._driver.execute_script('window.scrollBy(0, {})'.format(str(scroll_amount)))
+                        time.sleep(sleep_time)
+            else:
+                self._driver.execute_script('window.scrollBy(0, {})'.format(str(pixel)))
             if log:
-                logger.info(f"Scroll down {pixel} pixel")
-            return
-        elif value:
-            element = self._driver.find_element(self._by, value)
-            if not element:
-                raise NSE("Input element not found, please check By and make sure it is loaded correctly")
-            self._driver.execute_script("arguments[0].scrollIntoView();", element)
-            if log:
-                logger.info(f"Scroll down to element {value}")
-        else:
-            js = "return action=document.body.scrollHeight"
-            height = 0
-            new_height = self._driver.execute_script(js)
-            while height < new_height:
-                for i in range(height, new_height, 100):
-                    self._driver.execute_script('window.scrollTo(0, {})'.format(i))
-                    height = new_height
-                    time.sleep(sleep_time)
-                    new_height = self._driver.execute_script(js)
-            if log:
-                logger.info(f"Scroll down to the bottom")
+                logger.debug(f"Scroll down {pixel} pixel")
 
+        elif value:
+            self.wait_element(value, by=by)
+            element = self._driver.find_element(by, value)
+
+            if slowly:
+                current_position = self._driver.execute_script("return window.pageYOffset;")
+                target_position = element.location['y']
+                # 200 works as a buffer
+                target = target_position - 200 if target_position > 200 else 0  
+
+                while current_position < target:
+                    current_position += slow_step
+                    if current_position > target:
+                        current_position = target
+                    self._driver.execute_script(f"window.scrollTo(0, {current_position});")
+                    time.sleep(sleep_time)
+            else:
+                self._driver.execute_script("arguments[0].scrollIntoView();", element)
+
+            if log:
+                logger.debug(f"Scroll down to element {value}")
+        else:
+            if slowly:
+                js = "return action=document.body.scrollHeight"
+                height = 0
+                new_height = self._driver.execute_script(js)
+                while height < new_height:
+                    for i in range(height, new_height, slow_step):
+                        self._driver.execute_script('window.scrollTo(0, {})'.format(i))
+                        time.sleep(sleep_time)
+                    height = new_height
+                    new_height = self._driver.execute_script(js)
+            else:
+                """
+                This action is easily detected by the website and must wait until the scroll bar is loaded, 
+                thus not recommended.
+                """
+                time.sleep(sleep_time * 4) # not optimal, change on condition
+                self._driver.execute_script("var q=document.documentElement.scrollTop=10000")
+
+            if log:
+
+                logger.debug(f"Scroll down to the bottom")
+
+    """
+    awaiting test
+    """
     @logger.catch
     def add_cookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
         if isinstance(cookieinstance, dict):
@@ -189,63 +250,61 @@ class DriverAction():
             if 'expiry' in cookieinstance:
                 del cookieinstance['expiry']
             if log:
-                logger.info(f"Added cookie: {cookieinstance}")
+                logger.debug(f"Added cookie: {cookieinstance}")
         elif isinstance(cookieinstance, list):
             for cookie in cookieinstance:
                 self._driver.add_cookie(cookie)
                 if 'expiry' in cookie:
                     del cookie['expiry']
                 if log:
-                    logger.info(f"Added cookie: {cookie}")
+                    logger.debug(f"Added cookie: {cookie}")
     
+    """
+    awaiting test
+    """
     @logger.catch
-    def window_switch(self, ActionList: List[Union[int, Callable]], log: bool = True) -> None:
+    def window_switch(self, ActionList: List[Union[int, tuple]], log: bool = True, by: By = None) -> None:
         """
         This function works as a second layer for abstract workflow,
         packing up a chain of action in ActionList for execution.
         An action can be a window index or a function for taking element etc.
         """
+        by = self._by if by is None else by
         for action in ActionList:
             if isinstance(action, int):
                 self._driver.switch_to.window(action)
                 if log:
-                    logger.info(f"Switched to window {self._driver.title}")
+                    logger.debug(f"Switched to window {self._driver.title}")
             elif isinstance(action, tuple):
                 func, args, kwargs = action
-                try:
-                    func(*args, **kwargs)
-                except Exception as e:
-                    logger.error(f"Failed to execute {func.__name__} with args {args} and kwargs {kwargs}: {e}")
+                func(*args, **kwargs)
             else:
                 raise ValueError("ActionList items must be either int or tuple(func, args, kwargs)")
         if log:
-            logger.info("Window switch completed")
+            logger.debug("Window switch completed")
 
     @logger.catch
-    def frame_switch(self, ActionList: List[Union[str, tuple]], log: bool = True) -> None:
+    def frame_switch(self, ActionList: List[Union[str, tuple]], log: bool = True, by: By = None) -> None:
         """
         This function works as a second layer for abstract workflow,
         packing up a chain of actions in ActionList for execution.
-        An action can be a frame name or a tuple containing a function and its arguments.
+        An action can be a frame locator or a tuple containing a function and its arguments.
         """
+        by = self._by if by is None else by
         for action in ActionList:
             if isinstance(action, str):
-                self._driver.switch_to.frame(action)
+                self.wait_element(action, by=by)
+                element = self._driver.find_element(by, action)
+                self._driver.switch_to.frame(element)
                 if log:
-                    logger.info(f"Switched to frame {action}")
+                    logger.debug(f"Switched to frame {action}")
             elif isinstance(action, tuple):
-                if len(action) != 3:
-                    logger.error("Tuple actions must be in the format (func, args, kwargs)")
-                    continue
-                func, args, kwargs = action
-                try:
-                    func(*args, **kwargs)
-                except Exception as e:
-                    logger.error(f"Failed to execute {func.__name__} with args {args} and kwargs {kwargs}: {e}")
+                func, args= action
+                func(*args)
             else:
                 raise ValueError("ActionList items must be either str or tuple(func, args, kwargs)")
         if log:
-            logger.info("Frame switch completed")
+            logger.debug("Frame switch completed")
 
     @staticmethod
     @logger.catch

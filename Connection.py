@@ -3,13 +3,16 @@ from selenium import webdriver
 from main import logger
 import settings
 
-_standard_option: list = [
+_STANDARD_DRIVER_OPTIONS: list = [
     "--incognito",
     "--disable-gpu",
     "--disable-blink-features=AutomationControlled"
 ]
 
-_experimental_option: dict = {
+"""
+experimental options require being manually added to the dict and are only suitable for Chrome driver
+"""
+_EXPERIMENTAL_OPTIONS: dict = {
     "detach": True,
     "excludeSwitches": ['enable-automation', 'enable-logging']
 }
@@ -61,7 +64,7 @@ class _Driver_core():
         self.selenium_driverType = selenium_driverType
         self.DriverOption_param = DriverOption_param
         self.headless = headless
-        self.opt_params = self.DriverOption_param + _standard_option if self.DriverOption_param else _standard_option
+        self.opt_params = self.DriverOption_param + _STANDARD_DRIVER_OPTIONS if self.DriverOption_param else _STANDARD_DRIVER_OPTIONS
         if headless:
             self.opt_params.append("--headless")
         # avoid repeated settings
@@ -145,8 +148,8 @@ class Driver_init(object):
             options.binary_location = settings.CHROMIUM
             for item in self._opt_params:
                 options.add_argument(item)
-            for opt in _experimental_option:
-                options.add_experimental_option(opt, _experimental_option[opt])
+            for opt in _EXPERIMENTAL_OPTIONS:
+                options.add_experimental_option(opt, _EXPERIMENTAL_OPTIONS[opt])
             driver = webdriver.Chrome(options=options)
             if driver:
                 driver.execute_cdp_cmd(self._script_func, {'source': self._stealth_js})

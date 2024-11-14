@@ -2,7 +2,7 @@ from main import logger
 from typing import List, Iterator
 from prettytable import PrettyTable
 
-_table_colorplan = {
+_TABLE_COLORPLAN = {
     "title": "\033[95m",      # Magenta
     "header": "\033[33m",     # Blue
     "row": "\033[92m",        # Greenss
@@ -99,17 +99,17 @@ class ParseToolKits():
             # Non-log version with color
             table = PrettyTable()
             if title:
-                table.title = _table_colorplan["title"] + title + _table_colorplan["default"]
+                table.title = _TABLE_COLORPLAN["title"] + title + _TABLE_COLORPLAN["default"]
             table.field_names = [
-                _table_colorplan["header"] + "Field" + _table_colorplan["default"],
-                _table_colorplan["header"] + "Item1" + _table_colorplan["default"],
-                _table_colorplan["header"] + "Item2" + _table_colorplan["default"],
+                _TABLE_COLORPLAN["header"] + "Field" + _TABLE_COLORPLAN["default"],
+                _TABLE_COLORPLAN["header"] + "Item1" + _TABLE_COLORPLAN["default"],
+                _TABLE_COLORPLAN["header"] + "Item2" + _TABLE_COLORPLAN["default"],
             ]
             for field, (val1, val2) in differences.items():
                 table.add_row([
-                    _table_colorplan["row"] + field + _table_colorplan["default"],
-                    _table_colorplan["row"] + str(val1) + _table_colorplan["default"],
-                    _table_colorplan["row"] + str(val2) + _table_colorplan["default"],
+                    _TABLE_COLORPLAN["row"] + field + _TABLE_COLORPLAN["default"],
+                    _TABLE_COLORPLAN["row"] + str(val1) + _TABLE_COLORPLAN["default"],
+                    _TABLE_COLORPLAN["row"] + str(val2) + _TABLE_COLORPLAN["default"],
                 ])
             print(table)
 
@@ -146,10 +146,10 @@ class ParseToolKits():
             return
         table = PrettyTable()
         if title:
-            table.title = _table_colorplan["title"] + title + _table_colorplan["default"]
-        table.field_names = [_table_colorplan["header"] + key + _table_colorplan["default"] for key in item_list[0].keys()]
+            table.title = _TABLE_COLORPLAN["title"] + title + _TABLE_COLORPLAN["default"]
+        table.field_names = [_TABLE_COLORPLAN["header"] + key + _TABLE_COLORPLAN["default"] for key in item_list[0].keys()]
         for item in item_list:
-            table.add_row([_table_colorplan["row"] + str(value) + _table_colorplan["default"] for value in item.values()])
+            table.add_row([_TABLE_COLORPLAN["row"] + str(value) + _TABLE_COLORPLAN["default"] for value in item.values()])
 
         print(table)
         # No color version for log
