@@ -3,8 +3,6 @@ chrome/
 
 # Ignore Firefox
 firefox/
-# End Generation Here
-```
 
 *.log
 
