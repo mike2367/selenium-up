@@ -10,7 +10,6 @@ _TABLE_COLORPLAN = {
 }
 
 class ParseToolKit():
-    @logger.catch
     @staticmethod
     def dict_search(items: dict, key: str, log: bool = False) -> Iterator:
         """
@@ -28,7 +27,7 @@ class ParseToolKit():
         stack = [items]
         while stack:
             current = stack.pop()
-            if isinstance(v, dict):
+            if isinstance(current, dict):
                 for k, v in current.items():
                     if k == key:
                         yield v
@@ -36,13 +35,12 @@ class ParseToolKit():
                     # dict in dict
                     else:
                         stack.append(v)
-            elif isinstance(v, list):
+            elif isinstance(current, list):
                 for v in current:
                     stack.append(v)
         if log:
             logger.info("dict search completed, result_num: {result_num}")
 
-    @logger.catch
     @staticmethod
     def spot_difference(item1, item2, title: str = "Difference Table", log: bool = False) -> dict:
         """
@@ -124,7 +122,6 @@ class ParseToolKit():
                 logger.info("\nDifferences found:\n" + log_table.get_string())
 
         return differences
-    @logger.catch
     @staticmethod
     def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
         """
@@ -144,12 +141,21 @@ class ParseToolKit():
         if not item_list:
             logger.warning("No items to display in table.")
             return
+        all_keys = set()
+        for item in item_list:
+            all_keys.update(item.keys())
+        sorted_keys = sorted(all_keys)  
         table = PrettyTable()
         if title:
             table.title = _TABLE_COLORPLAN["title"] + title + _TABLE_COLORPLAN["default"]
-        table.field_names = [_TABLE_COLORPLAN["header"] + key + _TABLE_COLORPLAN["default"] for key in item_list[0].keys()]
+        table.field_names = [_TABLE_COLORPLAN["header"] + key + _TABLE_COLORPLAN["default"] for key in sorted_keys]
         for item in item_list:
-            table.add_row([_TABLE_COLORPLAN["row"] + str(value) + _TABLE_COLORPLAN["default"] for value in item.values()])
+            row = []
+            for key in sorted_keys:
+                value = item.get(key, '')  
+                colored_value = f"{_TABLE_COLORPLAN['row']}{value}{_TABLE_COLORPLAN['default']}"
+                row.append(colored_value)
+            table.add_row(row)
 
         print(table)
         # No color version for log
@@ -157,9 +163,9 @@ class ParseToolKit():
             log_table = PrettyTable()
             if title:
                 log_table.title = title
-            log_table.field_names = list(item_list[0].keys())
+            log_table.field_names = sorted_keys  # Ensure consistent ordering
             for item in item_list:
-                log_table.add_row([str(value) for value in item.values()])
+                log_table.add_row([str(item.get(key, '')) for key in sorted_keys])
             logger.info("\nInfo Table Output:\n" + log_table.get_string())
 
-
+                # Start Generation Here
