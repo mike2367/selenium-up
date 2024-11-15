@@ -1,3 +1,3 @@
-CHROMIUM = "./Chrome/chrome.exe"
-FIREFOX = "./Firefox/firefox.exe"
+CHROMIUM = "./chrome/"
+FIREFOX = "./firefox/"
 

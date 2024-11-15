@@ -1,6 +1,7 @@
 from typing import Literal, Union
 from selenium import webdriver
 from main import logger
+from os import path
 import settings
 
 _STANDARD_DRIVER_OPTIONS: list = [
@@ -145,7 +146,7 @@ class Driver_init(object):
         if self._selenium_driverType == 'Chrome':
             options = webdriver.ChromeOptions()
             # config your own binary loc in settings
-            options.binary_location = settings.CHROMIUM
+            options.binary_location = path.join(settings.CHROMIUM, "chrome.exe")
             for item in self._opt_params:
                 options.add_argument(item)
             for opt in _EXPERIMENTAL_OPTIONS:
@@ -162,7 +163,7 @@ class Driver_init(object):
         elif self._selenium_driverType == 'Firefox':
             options = webdriver.FirefoxOptions()
             # config your own binary loc in settings
-            options.binary_location = settings.FIREFOX
+            options.binary_location = path.join(settings.FIREFOX, "firefox.exe")
             for item in self._opt_params:
                 options.add_argument(item)
             driver = webdriver.Firefox(options=options)
