@@ -2,6 +2,7 @@ from loguru import logger
 import yagmail
 import sys
 from typing import Union
+
 class Customized_Log(object):
     def __new__(cls, *args, **kwargs):
         instance = super(Customized_Log, cls).__new__(cls)

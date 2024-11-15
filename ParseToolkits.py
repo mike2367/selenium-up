@@ -10,6 +10,7 @@ _TABLE_COLORPLAN = {
 }
 
 class ParseToolKit():
+    @logger.catch
     @staticmethod
     def dict_search(items: dict, key: str, log: bool = False) -> Iterator:
         """
@@ -169,4 +170,7 @@ class ParseToolKit():
             for item in item_list:
                 log_table.add_row([str(item.get(key, '')) for key in sorted_keys])
             logger.info("\nInfo Table Output:\n" + log_table.get_string())
+
+
+
 
