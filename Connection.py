@@ -92,8 +92,8 @@ class _Driver_core():
     def __repr__(self) -> str:
         print("-" * 100)
         driver_info = """
-            WebDriver:{self.selenium_driverType}
-            DriverOptions:{self.opt_params}"""
+            WebDriver: {}
+            DriverOptions: {}""".format(self.selenium_driverType, self.opt_params)
         logger.info(f"Driver info: {driver_info}")
         return "-" * 100
 
