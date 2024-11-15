@@ -41,6 +41,7 @@ class ParseToolKit():
         if log:
             logger.info("dict search completed, result_num: {result_num}")
 
+    @logger.catch
     @staticmethod
     def spot_difference(item1, item2, title: str = "Difference Table", log: bool = False) -> dict:
         """
@@ -122,6 +123,7 @@ class ParseToolKit():
                 logger.info("\nDifferences found:\n" + log_table.get_string())
 
         return differences
+    @logger.catch
     @staticmethod
     def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
         """
@@ -163,9 +165,8 @@ class ParseToolKit():
             log_table = PrettyTable()
             if title:
                 log_table.title = title
-            log_table.field_names = sorted_keys  # Ensure consistent ordering
+            log_table.field_names = sorted_keys  
             for item in item_list:
                 log_table.add_row([str(item.get(key, '')) for key in sorted_keys])
             logger.info("\nInfo Table Output:\n" + log_table.get_string())
 
-                # Start Generation Here
