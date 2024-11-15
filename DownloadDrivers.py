@@ -2,7 +2,6 @@ import os
 import urllib.request
 import zipfile
 import shutil
-import sys
 import time
 import hashlib
 
@@ -19,7 +18,8 @@ chrome_files_info = [
     (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/chrome-win/chrome.zip.003",
         "2d58643f6b13d1ef88f8caaf860f833e6680d5a933e2d5a345b3396e2d547b7d",
-    )(
+    ),
+    (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/chrome-win/chrome.zip.004",
         "da16163d9520fe8bf9db83ef729bee9b01255b5260d89a841a4a261368c87c13",
     ),
@@ -37,7 +37,8 @@ firefox_files_info = [
     (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/firefox-win/firefox.zip.003",
         "3365d3ea171e20e32016da8f3e52c2004d2315da1cab06a4bb31c693d5dd93f7",
-    )(
+    ),
+    (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/firefox-win/firefox.zip.004",
         "56c782a7d28d239dc307b64ca09951aa58fac6bc4b53ac1d64298f70ba07f7b3",
     ),
@@ -84,14 +85,21 @@ def download_files(files_info, download_path, retries=3, delay=2):
     return file_paths
 
 
+# Function to combine split zip files
+def combine_files(file_paths, combined_file_path):
+    with open(combined_file_path, "wb") as combined_file:
+        for file_path in file_paths:
+            with open(file_path, "rb") as part_file:
+                shutil.copyfileobj(part_file, combined_file)
+
+
 # Function to extract files
-def extract_files(file_paths, extract_path):
+def extract_file(file_path, extract_path):
     os.makedirs(extract_path, exist_ok=True)
-    print(f"Extracting files to {extract_path}...")
-    for file_path in file_paths:
-        with zipfile.ZipFile(file_path, "r") as zip_ref:
-            zip_ref.extractall(extract_path)
-        os.remove(file_path)
+    print(f"Extracting {file_path} to {extract_path}...")
+    with zipfile.ZipFile(file_path, "r") as zip_ref:
+        zip_ref.extractall(extract_path)
+    os.remove(file_path)
 
 
 # Function to get extraction paths
@@ -104,7 +112,6 @@ def get_extraction_paths():
         except ImportError as e:
             print("Error importing settings:", e)
     print("Settings file not found or incomplete. Please enter extraction paths.")
-    
     chromium_path = (
         input("Enter path for Chrome extraction (default ./chrome/): ") or "./chrome/"
     )
@@ -112,11 +119,8 @@ def get_extraction_paths():
         input("Enter path for Firefox extraction (default ./firefox/): ")
         or "./firefox/"
     )
-    with open("settings.py", "w") as f:
-        f.write(f"CHROMIUM = '{chromium_path}'\n")
-        f.write(f"FIREFOX = '{firefox_path}'\n")
-
     return chromium_path, firefox_path
+
 
 def main():
     chromium_path, firefox_path = get_extraction_paths()
@@ -125,7 +129,9 @@ def main():
     chrome_download_path = "./chrome_downloads"
     chrome_files = download_files(chrome_files_info, chrome_download_path)
     if len(chrome_files) == len(chrome_files_info):
-        extract_files(chrome_files, chromium_path)
+        combined_chrome_file = os.path.join(chrome_download_path, "chrome_combined.zip")
+        combine_files(chrome_files, combined_chrome_file)
+        extract_file(combined_chrome_file, chromium_path)
         shutil.rmtree(chrome_download_path)
     else:
         print("Not all Chrome files were downloaded completely. Please retry.")
@@ -134,7 +140,11 @@ def main():
     firefox_download_path = "./firefox_downloads"
     firefox_files = download_files(firefox_files_info, firefox_download_path)
     if len(firefox_files) == len(firefox_files_info):
-        extract_files(firefox_files, firefox_path)
+        combined_firefox_file = os.path.join(
+            firefox_download_path, "firefox_combined.zip"
+        )
+        combine_files(firefox_files, combined_firefox_file)
+        extract_file(combined_firefox_file, firefox_path)
         shutil.rmtree(firefox_download_path)
     else:
         print("Not all Firefox files were downloaded completely. Please retry.")
