@@ -240,9 +240,7 @@ class DriverAction():
 
                 logger.debug(f"Scroll down to the bottom")
 
-    """
-    awaiting test
-    """
+
     @logger.catch
     def add_cookies(self, cookieinstance: Union[dict, List[dict]], log: bool = True) -> None:
         if isinstance(cookieinstance, dict):
@@ -259,29 +257,28 @@ class DriverAction():
                 if log:
                     logger.debug(f"Added cookie: {cookie}")
     
-    """
-    awaiting test
-    """
+
     @logger.catch
-    def window_switch(self, ActionList: List[Union[int, tuple]], log: bool = True, by: By = None) -> None:
+    def window_switch(self, ActionList: List[Union[int, tuple]], log: bool = True, by: By = None) -> str:
         """
         This function works as a second layer for abstract workflow,
         packing up a chain of action in ActionList for execution.
-        An action can be a window index or a function for taking element etc.
+        An action can be a window index(begin from 0) or a function for taking element etc.
         """
         by = self._by if by is None else by
         for action in ActionList:
             if isinstance(action, int):
-                self._driver.switch_to.window(action)
+                self._driver.switch_to.window(self._driver.window_handles[action])
                 if log:
                     logger.debug(f"Switched to window {self._driver.title}")
             elif isinstance(action, tuple):
-                func, args, kwargs = action
-                func(*args, **kwargs)
+                func, args= action
+                func(*args)
             else:
                 raise ValueError("ActionList items must be either int or tuple(func, args, kwargs)")
         if log:
             logger.debug("Window switch completed")
+        return self._driver.title
 
     @logger.catch
     def frame_switch(self, ActionList: List[Union[str, tuple]], log: bool = True, by: By = None) -> None:

@@ -9,7 +9,7 @@ _TABLE_COLORPLAN = {
     "default": "\033[0m"        
 }
 
-class ParseToolKits():
+class ParseToolKit():
     @logger.catch
     @staticmethod
     def dict_search(items: dict, key: str, log: bool = False) -> Iterator:
@@ -126,7 +126,7 @@ class ParseToolKits():
         return differences
     @logger.catch
     @staticmethod
-    def table_output(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
+    def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
         """
         Prints a table of items in a list of dictionaries.
 
