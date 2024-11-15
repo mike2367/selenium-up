@@ -11,3 +11,5 @@ firefox/
 __pycache__/
 
 local_test.py
+
+.venv/
