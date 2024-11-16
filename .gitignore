@@ -10,5 +10,7 @@ __pycache__/
 
 local_test.py
 
-.venv/
+venv
 *.csv
+
+.idea

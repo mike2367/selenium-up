@@ -1,5 +1,5 @@
 from main import logger
-from Connection import Driver_init
+from Connection import DriverInit
 from DriverAction import DriverAction, By
 from abc import ABC, abstractmethod
 from typing import Union, List
@@ -10,24 +10,24 @@ class Workflow(ABC):
                  email_level = "CRITICAL",*driver_params:any) -> None:
         
         super().__init__()
-        self.driver = Driver_init(*driver_params)
+        self.driver = DriverInit(*driver_params)
         self.by = by
         self.driver_action = DriverAction(self.driver, self.by, contact, email_level)
         self.urls = urls
     @logger.catch
     @abstractmethod
-    def main_driver_flow(self, *input:any) -> any:
+    def main_driver_flow(self, *mdf_input:any) -> any:
         return """
         complete your own driver flow
         """
     
     @logger.catch
-    def parse_flow(self, *input:any) -> any:
+    def parse_flow(self, *pf_input:any) -> any:
         return """
         complete your own parse flow
         """
     @logger.catch
-    def save_flow(self, *input:any) -> None:
+    def save_flow(self, *sf_input:any) -> None:
         logger.success(f"result successfully saved")
 
     @logger.catch

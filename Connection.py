@@ -18,12 +18,12 @@ _EXPERIMENTAL_OPTIONS: dict = {
     "excludeSwitches": ['enable-automation', 'enable-logging']
 }
 
-class _Driver_core():
-    def __init__(self, 
-        selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
-        DriverOption_param: Union[None, list] = None,
-        headless: bool = False,    
-    ) -> None:
+class _DriverCore:
+    def __init__(self,
+                 selenium_driver_type: Literal['Chrome', 'Firefox'] = 'Chrome',
+                 driver_option_param: Union[None, list] = None,
+                 headless: bool = False,
+                 ) -> None:
         """
         Initializes the Driver_core class with specified browser settings.
 
@@ -62,8 +62,8 @@ class _Driver_core():
             JavaScript code read from 'stealth.min.js' for further fingerprint elimination.
         """
         
-        self.selenium_driverType = selenium_driverType
-        self.DriverOption_param = DriverOption_param
+        self.selenium_driverType = selenium_driver_type
+        self.DriverOption_param = driver_option_param
         self.headless = headless
         self.opt_params = self.DriverOption_param + _STANDARD_DRIVER_OPTIONS if self.DriverOption_param else _STANDARD_DRIVER_OPTIONS
         if headless:
@@ -100,17 +100,17 @@ class _Driver_core():
 
    
 
-class Driver_init(object):
+class DriverInit(object):
     def __new__(cls, *args, **kwargs):
-        instance = super(Driver_init, cls).__new__(cls)
+        instance = super(DriverInit, cls).__new__(cls)
         instance.__init__(*args, **kwargs)
         return instance._driver_instance()
-    def __init__(self, 
-        selenium_driverType: Literal['Chrome', 'Firefox'] = 'Chrome',
-        DriverOption_param: Union[None, list] = None,
-        headless: bool = False,    
-    ) -> None:
-        self._driver_core = _Driver_core(selenium_driverType, DriverOption_param, headless)
+    def __init__(self,
+                 selenium_driver_type: Literal['Chrome', 'Firefox'] = 'Chrome',
+                 driver_option_param: Union[None, list] = None,
+                 headless: bool = False,
+                 ) -> None:
+        self._driver_core = _DriverCore(selenium_driver_type, driver_option_param, headless)
         self._selenium_driverType = self._driver_core.selenium_driverType
         self._opt_params = self._driver_core.opt_params
         self._script_func = self._driver_core.script_func
@@ -123,8 +123,9 @@ class Driver_init(object):
     This function is explictly used for non-chrome browser to eliminate driver signiture
     and is required to be executed every time close to the validation
     """
-    @logger.catch
+
     @staticmethod
+    @logger.catch
     def insert_undefined_js(driver:any)->None:
         undefined_js = """
                 Object.defineProperty(navigator, 'webdriver', {
@@ -157,6 +158,9 @@ class Driver_init(object):
                 driver.execute_cdp_cmd(self._script_func, {"source": self._undefined_js})
                 # To deal with CHR memory fail
                 driver.execute_cdp_cmd(self._script_func, {"source": self._CHR_mem_js})
+                logger.success("Selenium driver successfully initialized")
+                print(self._driver_core)
+                return driver
                 
 
 
@@ -167,12 +171,11 @@ class Driver_init(object):
             for item in self._opt_params:
                 options.add_argument(item)
             driver = webdriver.Firefox(options=options)
+            if driver:
+                logger.success("Selenium driver successfully initialized")
+                print(self._driver_core)
+                return driver
 
-
-        if driver:
-            logger.success("Selenium driver successfully initialized")
-            print(self._driver_core)
-        return driver
     
 
     def __repr__(self) -> str:

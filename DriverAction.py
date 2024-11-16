@@ -2,10 +2,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from typing import Union, List, Callable
 from main import logger
-from Log import Customized_Log
-from selenium.webdriver.support import expected_conditions as EC
+from Log import CustomLog
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException as NSE
+from selenium.common.exceptions import NoSuchElementException
 from functools import wraps
 import random
 import time
@@ -29,10 +29,10 @@ def wait_element_decorator(func: Callable) -> Callable:
         by = self._by if by is None else by
         try:
             element = WebDriverWait(self._driver, wait_time).until(
-                EC.presence_of_element_located((by, value))
+                ec.presence_of_element_located((by, value))
             )
             if not element:
-                raise NSE("Input element not found, please check By and make sure it is loaded correctly")
+                raise NoSuchElementException("Input element not found, please check By and make sure it is loaded correctly")
             if _decorator_log:
                 logger.debug(f"Waited for element {value}")
         except Exception as e:
@@ -41,7 +41,7 @@ def wait_element_decorator(func: Callable) -> Callable:
         return func(self, value, *args, log=kwargs.get('log', True), by=by, **kwargs)
     return wrapper
 
-class DriverAction():
+class DriverAction:
     """
     A class to perform various actions on web elements using Selenium WebDriver.
 
@@ -85,7 +85,7 @@ class DriverAction():
                  email_level = "CRITICAL") -> None:
         self._driver = driver
         self._by = by
-        Customized_Log.contact_setting(logger, email_level, contact)
+        CustomLog.contact_setting(logger, email_level, contact)
     
 
     @wait_element_decorator
@@ -145,10 +145,10 @@ class DriverAction():
     def wait_element(self, value: str, wait_time: int = 20, log: bool = False, by: By = None) -> any:
         by = self._by if by is None else by
         element = WebDriverWait(self._driver, wait_time).until(
-            EC.presence_of_element_located((by, value))
+            ec.presence_of_element_located((by, value))
         )
         if not element:
-            raise NSE("Input element not found, please check By and make sure it is loaded correctly")
+            raise NoSuchElementException("Input element not found, please check By and make sure it is loaded correctly")
         if log:
             logger.debug(f"Wait for element {value}")
         return element
@@ -264,14 +264,13 @@ class DriverAction():
     
 
     @logger.catch
-    def window_switch(self, ActionList: List[Union[int, tuple]], log: bool = True, by: By = None) -> str:
+    def window_switch(self, actionlist: List[Union[int, tuple]], log: bool = True) -> str:
         """
         This function works as a second layer for abstract workflow,
         packing up a chain of action in ActionList for execution.
         An action can be a window index(begin from 0) or a function for taking element etc.
         """
-        by = self._by if by is None else by
-        for action in ActionList:
+        for action in actionlist:
             if isinstance(action, int):
                 self._driver.switch_to.window(self._driver.window_handles[action])
                 if log:
@@ -286,14 +285,14 @@ class DriverAction():
         return self._driver.title
 
     @logger.catch
-    def frame_switch(self, ActionList: List[Union[str, tuple]], log: bool = True, by: By = None) -> None:
+    def frame_switch(self, actionlist: List[Union[str, tuple]], log: bool = True, by: By = None) -> None:
         """
         This function works as a second layer for abstract workflow,
         packing up a chain of actions in ActionList for execution.
         An action can be a frame locator or a tuple containing a function and its arguments.
         """
         by = self._by if by is None else by
-        for action in ActionList:
+        for action in actionlist:
             if isinstance(action, str):
                 self.wait_element(action, by=by)
                 element = self._driver.find_element(by, action)
@@ -329,7 +328,7 @@ class DriverAction():
         base_url = "https://bot.sannysoft.com/"
         driver.get(base_url)
         all_pass = True
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="fp2"]/tr[20]/td[2]')))
+        WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.XPATH, '//*[@id="fp2"]/tr[20]/td[2]')))
         tds = driver.find_elements(by=By.XPATH, value='//*[@id="fp2"]/tr/td[2]')
         for td in tds:
             if td.text != "ok":
