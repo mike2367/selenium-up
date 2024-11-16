@@ -2,6 +2,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from typing import Union, List, Callable
 from main import logger
+from Log import Customized_Log
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException as NSE
@@ -50,6 +51,8 @@ class DriverAction():
         The Selenium WebDriver instance used to interact with the web browser.
     _by : By
         The method used to locate elements on the web page.
+    contact, email_level : Union[dict, None], "CRITICAL"
+        Made for customizing email contact whenever necessary.
 
     Methods:
     --------
@@ -78,9 +81,11 @@ class DriverAction():
         Scrolls the web page down and logs the action.
     """
 
-    def __init__(self, driver, by: By) -> None:
+    def __init__(self, driver, by: By, contact:Union[dict, None] = None, 
+                 email_level = "CRITICAL") -> None:
         self._driver = driver
         self._by = by
+        Customized_Log.contact_setting(logger, email_level, contact)
     
 
     @wait_element_decorator

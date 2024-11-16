@@ -12,7 +12,6 @@ class Customized_Log(object):
                      rotation: str = "00:00",
                      level: str = "DEBUG",
                      Format: str = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
-                     email_level: str = None,
                      contact_param: Union[dict, None] = None,
                      new_terminal_level: str = "ERROR"
                      ) -> None:
@@ -29,10 +28,10 @@ class Customized_Log(object):
         """
         self.custom_logger = logger
         self.custom_logger.add(filepath, rotation=rotation, level=level, format=Format)
-        self._email_setting(email_level, contact_param)
+        self._email_setting(param=contact_param)
         self._set_new_terminal_level(new_terminal_level)
 
-    def _email_setting(self, level:str = "ERROR", param:Union[dict, None] = None) -> None:
+    def _email_setting(self, level:str = "CRITICAL", param:Union[dict, None] = None) -> None:
         """
         Send email to the contact specified in the 'contact_param' dictionary once an error occurs.
 
@@ -55,6 +54,25 @@ class Customized_Log(object):
                 
                 # Add the email sending function as a loguru handler
                 self.custom_logger.add(send_email, level=level)
+            except Exception as e:
+                logger.error(f"Failed to set up email handler: {e}")
+    @staticmethod
+    def contact_setting(logger:any, email_level: str = "CRITICAL", param:Union[dict, None] = None) -> None:
+        """
+        public API for email reciever setting
+        """
+        if param:
+            try:
+                yag = yagmail.SMTP(user=param['username'], password=param['password'])
+                def send_email(message):
+                    yag.send(
+                        to=param['to'],
+                        subject='Log {} Notification'.format(email_level),
+                        contents=message
+                    )
+                
+                # Add the email sending function as a loguru handler
+                logger.add(send_email, level=email_level)
             except Exception as e:
                 logger.error(f"Failed to set up email handler: {e}")
 

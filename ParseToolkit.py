@@ -126,7 +126,7 @@ class ParseToolKit():
         return differences
     @logger.catch
     @staticmethod
-    def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
+    def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> List[dict]:
         """
         Prints a table of items in a list of dictionaries.
 
@@ -170,6 +170,8 @@ class ParseToolKit():
             for item in item_list:
                 log_table.add_row([str(item.get(key, '')) for key in sorted_keys])
             logger.info("\nInfo Table Output:\n" + log_table.get_string())
+
+        return item_list
 
 
 
