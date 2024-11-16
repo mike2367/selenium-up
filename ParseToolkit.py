@@ -9,9 +9,9 @@ _TABLE_COLORPLAN = {
     "default": "\033[0m"        
 }
 
-class ParseToolKit():
-    @logger.catch
+class ParseToolKit:
     @staticmethod
+    @logger.catch
     def dict_search(items: dict, key: str, log: bool = False) -> Iterator:
         """
         Searches for a specified key in a nested dictionary or list structure and yields its values.
@@ -42,8 +42,9 @@ class ParseToolKit():
         if log:
             logger.info("dict search completed, result_num: {result_num}")
 
-    @logger.catch
+
     @staticmethod
+    @logger.catch
     def spot_difference(item1, item2, title: str = "Difference Table", log: bool = False) -> dict:
         """
         Compare two JSON-like structures (dicts, lists) and output differences in table.
@@ -124,8 +125,9 @@ class ParseToolKit():
                 logger.info("\nDifferences found:\n" + log_table.get_string())
 
         return differences
-    @logger.catch
+
     @staticmethod
+    @logger.catch
     def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> List[dict]:
         """
         Prints a table of items in a list of dictionaries.
@@ -143,7 +145,7 @@ class ParseToolKit():
         """
         if not item_list:
             logger.warning("No items to display in table.")
-            return
+            return item_list
         all_keys = set()
         for item in item_list:
             all_keys.update(item.keys())
