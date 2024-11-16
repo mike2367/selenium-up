@@ -153,6 +153,5 @@ class SaveToolKit:
         if log:
             logger.success(f"Inserted {len(item_list)} records into Redis.")
 
-                # Start Generation Here
 
 

@@ -1,14 +1,14 @@
-from .Connection import Driver_init
+from .Connection import DriverInit
 from .ParseToolKit import ParseToolKit
 from .SaveToolKit import SaveToolKit
 from .DriverAction import DriverAction
 from .Workflow import Workflow
-from .Log import Customized_Log
+from .Log import CustomLog
 
 
-__all__ = ['Driver_init', 
+__all__ = ['DriverInit',
            'ParseToolKit',
            'SaveToolKit',
            'DriverAction',
            'Workflow',
-           'Customized_Log']
+           'CustomLog']
