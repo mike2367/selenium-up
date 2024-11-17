@@ -33,7 +33,7 @@ functions for convient use.
 - Instantiate the `DriverAction` class, give it your intened driver and By, then you can complete your 
 task using whatever function in it.
 - Every function which uses `self._by` by default can be redesignited with a desired one.
-- `driver_signiture_validate` is a static method which test the signiture situation by vist <https://bot.sannysoft.com/>,
+- `driver_signiture_validate` is a static method which test the signiture situation by visting <https://bot.sannysoft.com/>,
 the default chrome driver can pass all tests, please do not modify this function.
 - Notice that `window_switch` and `frame_switch` are created as function wrappers basing on the concept of
 functional programming, detailed instructions are on the documentation.
