@@ -1,6 +1,18 @@
 # Selenium_up
 
 Commonly used web crawling toolkit and Selenium API framework.
+## Table of Contents
+- [Getting Started](#getting-started)
+  - [Install requirements](#install-the-required-packages)
+  - [Install Browsers](#install-the-browser-drivers)
+- [Main Content and Usage](#main-content-and-usage)
+    - [Content.md](Content.md)
+    - [Example.md](Example.md)
+- [Maintainers](#maintainers)
+    - [@mike2367](https://github.com/mike2367)
+    - [@zivmax](https://github.com/zivmax)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Getting Started
 
@@ -20,7 +32,7 @@ python DownloadDrivers.py
 ## Main Content and Usage
 
  Please refer to [Content.md](Content.md) for main file contents and brief user guide.
-
+ For some brief examples, please refer to [Example.md](Example.md).
 
 ## Maintainers
 [@mike2367](https://github.com/mike2367) </br>
