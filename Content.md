@@ -1,13 +1,13 @@
 ## File Contents
 ### Log.py
-- Defines `CustomLog`, which wraps library `loguru` and `yagmail`.
+- Defines the `CustomLog` class, which wraps library `loguru` and `yagmail`.
 - ### Usage:
 - This class can be used separately, which gives a logger instance when instantiated, default as 
 log into ./Log.log, refresh at 00:00 daily, without email contact and will open a new terminal for `ERROR`
 level messages.
 - By default, a logger instance is created in `main.py` and is used to monitor every event within the task.
 - The `_CONTACT_PARAM` can be configured with username and APP password provided by 
-IMAP service, this user will be incharge of all task related emails, which will be send if any `CRITICAL`(by default)
+IMAP service, this user will be incharge of all task related emails, which will be sent if any `CRITICAL`(by default)
 situation is found.
 
 ### Connection.py
