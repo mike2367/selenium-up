@@ -5,7 +5,7 @@ chrome/
 firefox/
 
 *.log
-
+.vscode
 __pycache__/
 
 local_test.py
