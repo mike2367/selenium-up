@@ -116,9 +116,8 @@ class CustomLog {
 
 	}
 
-	/**
-	 * alter logback.xml with current parameters.
-	 */
+	// alter logback.xml with current parameters.
+
     private void initializeLogger() {
         try {
             String logbackConfigPath = "src/main/resources/logback.xml";
