@@ -1,0 +1,5 @@
+/target/
+/Chrome
+/Firefox
+/.settings
+.classpath
