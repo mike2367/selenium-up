@@ -8,37 +8,16 @@
   
   
   <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
-                    
-    
-    
     <!-- stdout format output -->
-                    
-    
-    
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                              
-      
-      
       <pattern>%d{yyyy-MM-dd} %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-                          
-    
-    
     </encoder>
-                
-  
-  
   </appender>
           
   
   
   <!-- daily generation -->
-          
-  
-  
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
-                    
-    
-    
     <!--  current log file name -->
                     
     
@@ -105,39 +84,36 @@
   
   
   </appender>
-          
+	<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+    <smtpHost>smtp.gmail.com</smtpHost>
+    <smtpPort>587</smtpPort>
+    <SSL>true</SSL>
+    <username>user</username>
+    <password>111</password>
+
+    <to>to@gmail.com</to>
+    <from>from@gmail.com</from>
+    <subject>Project log: %logger{20} - %m</subject>
+    <asynchronousSending>true</asynchronousSending>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] |- %m%n</pattern>
+    </layout>
+  </appender>
+
+  <logger name="com.xxx.cloud.util.EmailLogger" level="ERROR" additivity="false">
+    <appender-ref ref="EMAIL" />
+  </logger>
+  
   
   
   <logger additivity="false" level="debug" name="com.xpwi">
-                    
-    
-    
     <appender-ref ref="FILE"/>
-                
-  
-  
   </logger>
-          
-  
-  
   <!-- root -->
-          
-  
-  
   <root level="trace">
-                    
-    
-    
     <appender-ref ref="STDOUT"/>
-                    
-    
-    
     <appender-ref ref="FILE"/>
                 
-  
-  
   </root>
-      
-
-
+    
 </configuration>

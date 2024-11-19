@@ -1,16 +1,14 @@
 package sele_up_java.selenium_up;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
 
-import com.google.common.net.HostAndPort;
 
 public class EmailConfig {
 	private String username;
     private String password;
+    private String from;
     private String to;
     private String smtpHost;
-    private int smtpPort;
+    private String smtpPort;
     
     private static class WrongEmailFormatException extends Exception {
     	private static final long serialVersionUID = 1L;
@@ -24,6 +22,7 @@ public class EmailConfig {
     	try {
     		for(String addrString: address) {
         		String host = addrString.split("@")[1];
+        		System.out.println("Current email host in use: " + host);
     		}
     	}catch (ArrayIndexOutOfBoundsException e) {
     		throw new WrongEmailFormatException("Please check and make sure that you input the correct email address");
@@ -32,13 +31,15 @@ public class EmailConfig {
     public EmailConfig(
     		String username, 
     		String password, 
+    		String from,
     		String to, 
     		String smtpHost, 
-    		int smtpPort) 
+    		String smtpPort) 
     {		
     	String [] emailStrings = {username, to, smtpHost};
         this.username = username;
         this.password = password;
+        this.from = from;
         this.to = to;
         this.smtpHost = smtpHost;
         try {
@@ -53,9 +54,10 @@ public class EmailConfig {
     // Getters
     public String getUsername() { return username; }
     public String getPassword() { return password; }
+    public String getFrom() {return this.from;}
     public String getTo() { return to; }
     public String getSmtpHost() { return smtpHost; }
-    public int getSmtpPort() { return smtpPort; }
+    public String getSmtpPort() { return smtpPort; }
     public String getHostName() {
         	return this.smtpHost.split("@")[1];
     }
