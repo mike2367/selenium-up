@@ -85,14 +85,14 @@
   
   </appender>
 	<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
-    <smtpHost>smtp.gmail.com</smtpHost>
-    <smtpPort>587</smtpPort>
+    <smtpHost></smtpHost>
+    <smtpPort></smtpPort>
     <SSL>true</SSL>
-    <username>user</username>
-    <password>111</password>
+    <username></username>
+    <password></password>
 
-    <to>to@gmail.com</to>
-    <from>from@gmail.com</from>
+    <to></to>
+    <from></from>
     <subject>Project log: %logger{20} - %m</subject>
     <asynchronousSending>true</asynchronousSending>
     <layout class="ch.qos.logback.classic.PatternLayout">
