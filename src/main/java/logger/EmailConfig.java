@@ -21,6 +21,7 @@ public class EmailConfig {
     	try {
     		for(String addrString: address) {
         		String host = addrString.split("@")[1];
+        		if(host != null) {}
     		}
     	}catch (ArrayIndexOutOfBoundsException e) {
     		throw new WrongEmailFormatException("Please check and make sure that you input the correct email address");
@@ -34,7 +35,7 @@ public class EmailConfig {
     		String smtpHost, 
     		String smtpPort) 
     {		
-    	String [] emailStrings = {from, to, smtpHost};
+    	String [] emailStrings = {from, to};
         this.username = username;
         this.password = password;
         this.from = from;

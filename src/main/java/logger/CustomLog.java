@@ -17,17 +17,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathFactory;
 import org.jdom2.xpath.XPathExpression;
 
-// If you still need these imports for other parts of your class,
-// ensure there are no naming conflicts with JDOM's Document class.
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Node;
 
 class CustomLog {
     
@@ -169,35 +158,33 @@ class CustomLog {
 
         SAXBuilder saxBuilder = new SAXBuilder();
         Document document = saxBuilder.build(xmlFile);
-
-        String attrString = null;
+        XPathFactory xFactory = XPathFactory.instance();
+        
+        // for attributes
         if (expression.contains("/@")) {
             int attrIndex = expression.lastIndexOf("/@");
-            if (attrIndex == -1) {
-                throw new Exception("Invalid XPath expression for attribute: " + expression);
-            }
 
             String elementXPath = expression.substring(0, attrIndex);
             String attributeName = expression.substring(attrIndex + 2); // Skip "/@"
 
-            XPathFactory xFactory = XPathFactory.instance();
             XPathExpression<Element> expr = xFactory.compile(elementXPath, Filters.element());
             Element element = expr.evaluateFirst(document);
 
             if (element != null) {
                 element.setAttribute(attributeName, newValue);
-                System.out.println("Attribute '" + attributeName + "' has been successfully updated to: " + newValue);
+                System.out.println("Attribute '" + attributeName + "' has been updated to: " + newValue);
             } else {
                 throw new Exception("No element found for the XPath expression: " + elementXPath);
             }
+            // for elements
         } else {
-            XPathFactory xFactory = XPathFactory.instance();
+            
             XPathExpression<Element> expr = xFactory.compile(expression, Filters.element());
             Element element = expr.evaluateFirst(document);
 
             if (element != null) {
                 element.setText(newValue);
-                System.out.println("Element '" + expression + "' has been successfully updated with new value: " + newValue);
+                System.out.println("Element '" + expression + "' has been updated to: " + newValue);
             } else {
                 throw new Exception("No element found for the XPath expression: " + expression);
             }
@@ -235,7 +222,7 @@ class CustomLog {
         try {
             
             String base_xpathString = "/configuration/appender[@name='EMAIL']";
-            String host_xpathString = "/configuration/appender[@name='EMAIL']/smtpHost";
+            String host_xpathString = base_xpathString + "/smtpHost";
             String Port_xpathString = base_xpathString + "/smtpPort";
             String user_xpathString = base_xpathString + "/username";
             String password_xpathString = base_xpathString + "/password";
