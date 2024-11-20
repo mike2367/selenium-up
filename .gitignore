@@ -4,3 +4,4 @@
 /.settings
 .classpath
 /src/main/java/logger/LogTest.java
+/.vscode
