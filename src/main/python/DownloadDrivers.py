@@ -113,11 +113,11 @@ def get_extraction_paths():
             print("Error importing settings:", e)
     print("Settings file not found or incomplete. Please enter extraction paths.")
     chromium_path = (
-        input("Enter path for Chrome extraction (default ./chrome/): ") or "./chrome/"
+        input("Enter path for Chrome extraction (default src/main/resources/chrome): ") or "src/main/resources/chrome/"
     )
     firefox_path = (
-        input("Enter path for Firefox extraction (default ./firefox/): ")
-        or "./firefox/"
+        input("Enter path for Firefox extraction (default src/main/resources/firefox): ")
+        or "src/main/resources/firefox"
     )
     return chromium_path, firefox_path
 

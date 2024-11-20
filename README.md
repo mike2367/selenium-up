@@ -18,7 +18,7 @@
 
 ## Getting Started
 
-### This is a Maven Project, for Java requirments, please refer to `pom.xml` for more information, a library higher than JavaSE-1.8 is recommended.
+### This is a Maven Project, for Java requirments, please refer to `pom.xml` for more information, a library higher than JavaSE-18 is recommended.
 
 ### Install the Browser Drivers
 

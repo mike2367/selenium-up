@@ -16,36 +16,42 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.6.1</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>1.6.1</version>
+</dependency>
+	<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>4.13.0</version>
+	</dependency>
+	 <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-java</artifactId>
-        <version>4.24.0</version>
+        <artifactId>selenium-devtools-v115</artifactId>
+        <version>4.13.0</version>
     </dependency>
       <dependency>
   		<groupId>mysql</groupId>
   		<artifactId>mysql-connector-java</artifactId>
   		<version>5.1.6</version>
   	</dependency>
-  	<dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
-        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.1.7</version>
+            <version>1.4.11</version>
         </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <version>1.1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
-        </dependency>
+		<dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>jakarta.mail</artifactId>
+        <version>2.0.1</version>
+    	</dependency>
         
         <dependency>
 			<groupId>dom4j</groupId>
@@ -56,6 +62,14 @@
             <artifactId>jaxen</artifactId>
             <version>1.1.1</version>
         </dependency>
+        
+       	<dependency>
+        	<groupId>org.junit.jupiter</groupId>
+        	<artifactId>junit-jupiter</artifactId>
+        	<version>5.9.3</version>
+        	<scope>test</scope>
+    	</dependency>
+    
 		
   </dependencies>
 </project>

@@ -1,7 +1,10 @@
 /target/
-/Chrome
-/Firefox
+src/main/resources/chrome
+src/main/resources/firefox
 /.settings
 .classpath
 /src/main/java/logger/LogTest.java
+/src/main/java/selenium/ConnectionTest.java
+/test-log-file
+.pydevproject
 /.vscode
