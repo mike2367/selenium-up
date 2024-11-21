@@ -14,12 +14,28 @@ import java.util.Map;
 
 public class DriverAction {
     private WebDriver driver;
+    private String inner_byString = "xpath";
+    private static final int GLOBAL_WAIT_TIME = 20;
+    /**@GLOBAL_DEBUG_LOG_LEVEL_STRING is set because the default debug mode ouput 
+     * excessive information, feel free to alter it to true for debug level,
+     * remember to alter the one in logback.xml as well*/
+    private static final Boolean GLOBAL_DEBUG_LOG_LEVEL = false;
+    private static final Boolean GLOBAL_DEBUG_LOG_SWTICH = true;
     private static final Logger logger = LoggerFactory.getLogger(DriverAction.class);
-
-    public DriverAction(WebDriver driver, By by, Map<String, Object> contact, String emailLevel) {
-        this.driver = driver;
+    
+    private void makeLog(String content) {
+    	if(GLOBAL_DEBUG_LOG_LEVEL){logger.debug(content);
+    	}
+    	else {
+    		logger.info(content);
+    	}
     }
-
+    public DriverAction(WebDriver driver, String inner_by) {
+        this.driver = driver;
+        if(inner_by != null) {
+        	this.inner_byString = inner_by;
+        }
+    }
     /**
      * Waits for a web element to be present.
      *
@@ -28,12 +44,13 @@ public class DriverAction {
      * @param decoratorLog  Whether to log the waiting action.
      * @return The found WebElement.
      */
-    private WebElement wait(By locator, int waitTime, boolean decoratorLog) {
+    private WebElement wait(String locator, int waitTime) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(waitTime));
-            WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-            if (decoratorLog) {
-                logger.debug("Waited for element {}", locator);
+            WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(
+            		this.ByLocator(this.inner_byString, locator)));
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
+                logger.info("Waited for element {}", locator);
             }
             return element;
         } catch (Exception e) {
@@ -50,12 +67,12 @@ public class DriverAction {
      * @param log          Whether to log the action.
      * @return A list of window handles.
      */
-    public List<String> clickElement(By locator, String elementName, boolean log) {
+    public List<String> clickElement(String locator, String elementName) {
         try {
-            WebElement element = wait(locator, 20, true);
+            WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             element.click();
-            if (log) {
-                logger.debug("Clicked on element {}", elementName);
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
+                logger.info("Clicked on element {}", elementName);
             }
             return List.copyOf(driver.getWindowHandles());
         } catch (Exception e) {
@@ -72,13 +89,13 @@ public class DriverAction {
      * @param log          Whether to log the action.
      * @return A list of window handles.
      */
-    public List<String> doubleClick(By locator, String elementName, boolean log) {
+    public List<String> doubleClick(String locator, String elementName) {
         try {
-            WebElement element = wait(locator, 20, true);
+            WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             Actions actions = new Actions(driver);
             actions.doubleClick(element).perform();
-            if (log) {
-                logger.debug("Double clicked on element {}", elementName);
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
+                logger.info("Double clicked on element {}", elementName);
             }
             return List.copyOf(driver.getWindowHandles());
         } catch (Exception e) {
@@ -95,13 +112,13 @@ public class DriverAction {
      * @param log          Whether to log the action.
      * @return A list of window handles.
      */
-    public List<String> rightClick(By locator, String elementName, boolean log) {
+    public List<String> rightClick(String locator, String elementName) {
         try {
-            WebElement element = wait(locator, 20, true);
+            WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             Actions actions = new Actions(driver);
             actions.contextClick(element).perform();
-            if (log) {
-                logger.debug("Right clicked on element {}", elementName);
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
+                logger.info("Right clicked on element {}", elementName);
             }
             return List.copyOf(driver.getWindowHandles());
         } catch (Exception e) {
@@ -118,12 +135,12 @@ public class DriverAction {
      * @param log        Whether to log the action.
      * @return The attribute value.
      */
-    public String getElementAttribute(By locator, String attribute, boolean log) {
+    public String getElementAttribute(String locator, String attribute) {
         try {
-            WebElement element = wait(locator, 20, true);
+            WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             String result = element.getAttribute(attribute).trim();
-            if (log) {
-                logger.debug("Get attribute " + attribute + " on element " + locator + ", result: " + result);
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
+                logger.info("Get attribute " + attribute + " on element " + locator + ", result: " + result);
             }
             return result;
         } catch (Exception e) {
@@ -139,11 +156,11 @@ public class DriverAction {
      * @param keys     The keys to send.
      * @param log      Whether to log the action.
      */
-    public void inputKeys(By locator, String keys, boolean log) {
+    public void inputKeys(String locator, String keys) {
         try {
-            WebElement element = wait(locator, 20, true);
+            WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             element.sendKeys(keys);
-            if (log) {
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
                 logger.debug("Input text '{}' into element {}", keys, locator);
             }
         } catch (Exception e) {
@@ -159,12 +176,9 @@ public class DriverAction {
      * @param waitTime Maximum time to wait in seconds.
      * @param log      Whether to log the action.
      */
-    public void waitElement(By locator, int waitTime, boolean log) {
+    public WebElement waitElement(By locator, int waitTime) {
         try {
-            waitElement(locator, waitTime, log);
-            if (log) {
-                logger.debug("Waited for element {}", locator);
-            }
+            return waitElement(locator, waitTime);
         } catch (Exception e) {
             logger.error("Failed to wait for element {}: {}", locator, e.getMessage());
             throw e;
@@ -181,9 +195,9 @@ public class DriverAction {
      * @param slowStep     The step size for slow movement.
      * @param slowWait     The wait time between steps in seconds.
      */
-    public void slideHorizontal(By locator, int offset, boolean log, boolean slowly, int slowStep, double slowWait) {
+    public void slideHorizontal(String locator, int offset, boolean log, boolean slowly, int slowStep, double slowWait) {
         try {
-            WebElement element = wait(locator, 20, true);
+            WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             Actions actions = new Actions(driver);
             if (!slowly) {
                 actions.clickAndHold(element).moveByOffset(offset, 0).release().perform();
@@ -223,7 +237,7 @@ public class DriverAction {
      * @param slowly     Whether to perform the scroll slowly.
      * @param slowStep   The step size for slow scrolling.
      */
-    public void scrollDown(By locator, Integer pixel, double sleepTime, boolean log, boolean slowly, int slowStep) {
+    public void scrollDown(String locator, Integer pixel, double sleepTime, boolean slowly, int slowStep) {
         try {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             if (pixel != null) {
@@ -237,11 +251,11 @@ public class DriverAction {
                 } else {
                     js.executeScript("window.scrollBy(0, " + pixel + ");");
                 }
-                if (log) {
+                if (GLOBAL_DEBUG_LOG_SWTICH) {
                     logger.debug("Scroll down {} pixels", pixel);
                 }
             } else if (locator != null) {
-                WebElement element = wait(locator, 20, true);
+                WebElement element = wait(locator, GLOBAL_WAIT_TIME);
                 if (slowly) {
                     Long currentPosition = (Long) js.executeScript("return window.pageYOffset;");
                     Long targetPosition = (long) element.getLocation().getY();
@@ -257,7 +271,7 @@ public class DriverAction {
                 } else {
                     js.executeScript("arguments[0].scrollIntoView();", element);
                 }
-                if (log) {
+                if (GLOBAL_DEBUG_LOG_SWTICH) {
                     logger.debug("Scroll down to element {}", locator);
                 }
             } else {
@@ -276,7 +290,7 @@ public class DriverAction {
                     Thread.sleep((long) (sleepTime * 4000));
                     js.executeScript("window.scrollTo(0, 10000);");
                 }
-                if (log) {
+                if (GLOBAL_DEBUG_LOG_SWTICH) {
                     logger.debug("Scroll down to the bottom");
                 }
             }
@@ -293,15 +307,15 @@ public class DriverAction {
      * @param log            Whether to log the action.
      */
     @SuppressWarnings("unchecked")
-    public void addCookies(Object cookieInstance, boolean log) {
+    public void addCookies(Object cookieInstance) {
         try {
             if (cookieInstance instanceof Map) {
                 Map<String, Object> cookie = (Map<String, Object>) cookieInstance;
-                addSingleCookie(cookie, log);
+                addSingleCookie(cookie);
             } else if (cookieInstance instanceof List) {
                 List<Map<String, Object>> cookies = (List<Map<String, Object>>) cookieInstance;
                 for (Map<String, Object> cookie : cookies) {
-                    addSingleCookie(cookie, log);
+                    addSingleCookie(cookie);
                 }
             }
         } catch (Exception e) {
@@ -316,7 +330,7 @@ public class DriverAction {
      * @param cookie The cookie data.
      * @param log    Whether to log the action.
      */
-    private void addSingleCookie(Map<String, Object> cookie, boolean log) {
+    private void addSingleCookie(Map<String, Object> cookie) {
         try {
             Cookie.Builder builder = new Cookie.Builder(cookie.get("name").toString(), cookie.get("value").toString());
             if (cookie.containsKey("domain")) {
@@ -333,7 +347,7 @@ public class DriverAction {
             }
             driver.manage().addCookie(builder.build());
             cookie.remove("expiry"); // Remove 'expiry' as per original Python logic
-            if (log) {
+            if (GLOBAL_DEBUG_LOG_SWTICH) {
                 logger.debug("Added cookie: {}", cookie);
             }
         } catch (Exception e) {
@@ -391,8 +405,7 @@ public class DriverAction {
         try {
             for (Object action : actionList) {
                 if (action instanceof String) {
-                    By locator = ByLocator(customBy, (String) action);
-                    WebElement frameElement = wait(locator, 20, true);
+                    WebElement frameElement = wait((String)action, GLOBAL_WAIT_TIME);
                     driver.switchTo().frame(frameElement);
                     if (log) {
                         logger.debug("Switched to frame {}", action);
@@ -405,7 +418,7 @@ public class DriverAction {
                 }
             }
             if (log) {
-                logger.debug("Frame switch completed");
+                logger.info("Frame switch completed");
             }
         } catch (Exception e) {
             logger.error("Failed to switch frames: {}", e.getMessage());
@@ -420,24 +433,23 @@ public class DriverAction {
      * @param value  The value to locate the element.
      * @return A new By locator with the updated value.
      */
-    private By ByLocator(By baseBy, String value) {
-        String byType = baseBy.toString().split(":")[0].trim();
+    private By ByLocator(String byType, String value) {
         switch (byType) {
-            case "By.id":
+            case "id":
                 return By.id(value);
-            case "By.name":
+            case "name":
                 return By.name(value);
-            case "By.xpath":
+            case "xpath":
                 return By.xpath(value);
-            case "By.cssSelector":
+            case "css":
                 return By.cssSelector(value);
-            case "By.className":
+            case "class":
                 return By.className(value);
-            case "By.linkText":
+            case "linkText":
                 return By.linkText(value);
-            case "By.partialLinkText":
+            case "partialLinkText":
                 return By.partialLinkText(value);
-            case "By.tagName":
+            case "tag":
                 return By.tagName(value);
             default:
                 throw new IllegalArgumentException("Unsupported By type: " + byType);
