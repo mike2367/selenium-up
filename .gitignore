@@ -4,6 +4,6 @@ src/main/resources/firefox
 /.settings
 .classpath
 *Test.java
-/test-log-file
+*.log
 .pydevproject
 /.vscode

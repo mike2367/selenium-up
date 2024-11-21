@@ -32,7 +32,7 @@ public class CustomLog {
     // Default Logging Parameters
     private static class LogDefaultParam {
         String LOG_FILE_LOCATION = "./log-file";
-        String LOG_NAME = "Log %d{yyyy-MM-dd}.log";
+        String LOG_NAME = "${LOG_FILE_LOCATION}/Log-%d{yyyy-MM-dd}.log";
         String FILE_ROLLING_POLICY = "TimeBasedRollingPolicy";
         String FILE_TRIGGERING_POLICY = "SizeBasedTriggeringPolicy";
         String MAX_KEEP_DAYS = "30";

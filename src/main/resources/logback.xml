@@ -2,73 +2,62 @@
 <!-- Detailed explanation: https://icode.blog.csdn.net/article/details/88874162 -->
 <!-- Scan this xml with an interval of 20 seconds, add revise -->
 <configuration debug="true" packagingData="true" scan="true" scanPeriod="20 seconds">
-
-    <property name="LOG_FILE_LOCATION" value="./test-log-file" />
-
-    <!-- Console Appender -->
-    <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
-        <!-- stdout format output -->
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <!-- Rolling File Appender -->
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
-        <!-- Current log file name -->
-        <file>${LOG_FILE_LOCATION}/TestLog.log</file>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- Zip archived log files daily -->
-            <fileNamePattern>${LOG_FILE_LOCATION}/Log%d{yyyy-MM-dd}.log.zip</fileNamePattern>
-            <!-- Keeps 30 days of logs -->
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <!-- Rollover on reaching 20MB -->
-            <maxFileSize>20MB</maxFileSize>
-        </triggeringPolicy>
-
-        <encoder>
-            <!-- file format output -->
-            <pattern>%d{HH:mm:ss} %-5level - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <!-- Email Appender Configuration -->
-    <appender class="ch.qos.logback.classic.net.SMTPAppender" name="EMAIL">
-        <smtpHost>smtp.gmail.com</smtpHost>
-        <smtpPort>587</smtpPort>
-        <starttls>true</starttls>
-        <username>your_email@gmail.com</username>
-        <password>your_app_specific_password</password>
-        <to>recipient@test.com</to>
-        <from>your_email@gmail.com</from>
-        <subject>Project log: %logger{20} - %m</subject>
-        <asynchronousSending>true</asynchronousSending>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] |- %m%n</pattern>
-        </layout>
-        <!-- Triggering policies for sending emails -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>ERROR</level>
-        </filter>
-    </appender>
-
-    <!-- Specific Logger for Email Notifications -->
-    <logger additivity="false" level="ERROR" name="com.xxx.cloud.util.EmailLogger">
-        <appender-ref ref="EMAIL" />
-    </logger>
-
-    <!-- Specific Logger for File Logging -->
-    <logger additivity="false" level="DEBUG" name="com.xpwi">
-        <appender-ref ref="FILE" />
-    </logger>
-
-    <!-- Root Logger -->
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
-    </root>
+  <property name="LOG_FILE_LOCATION" value="./log-file" />
+  <!-- Console Appender -->
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <!-- stdout format output -->
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <!-- Rolling File Appender -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <fileNamePattern>${LOG_FILE_LOCATION}/Log-%d{yyyy-MM-dd}.log</fileNamePattern>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- Zip archived log files daily -->
+      <fileNamePattern>${LOG_FILE_LOCATION}/Log%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+      <!-- Keeps 30 days of logs -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <!-- Rollover on reaching 20MB -->
+      <maxFileSize>20MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <!-- file format output -->
+      <pattern>%d{HH:mm:ss} %-5level - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <!-- Email Appender Configuration -->
+  <appender class="ch.qos.logback.classic.net.SMTPAppender" name="EMAIL">
+    <smtpHost>smtp@gmail.com</smtpHost>
+    <smtpPort>587</smtpPort>
+    <starttls>true</starttls>
+    <username>test_user</username>
+    <password>test_pass</password>
+    <to>recipient@test.com</to>
+    <from>sender@test.com</from>
+    <subject>Project log: %logger{20} - %m</subject>
+    <asynchronousSending>true</asynchronousSending>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] |- %m%n</pattern>
+    </layout>
+    <!-- Triggering policies for sending emails -->
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
+  </appender>
+  <!-- Specific Logger for Email Notifications -->
+  <logger additivity="false" level="ERROR" name="com.xxx.cloud.util.EmailLogger">
+    <appender-ref ref="EMAIL" />
+  </logger>
+  <!-- Specific Logger for File Logging -->
+  <logger additivity="false" level="DEBUG" name="com.xpwi">
+    <appender-ref ref="FILE" />
+  </logger>
+  <!-- Root Logger -->
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
 </configuration>

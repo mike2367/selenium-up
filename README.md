@@ -20,6 +20,8 @@
 
 ### This is a Maven Project, for Java requirments, please refer to `pom.xml` for more information, a library higher than JavaSE-18 is recommended.
 
+### Note: versions of `slf4j-api`, `logback-core`, `logback-classic` are explicitly chosen and tested, we highly recommend you not to alter them.
+
 ### Install the Browser Drivers
 
 ```shell
