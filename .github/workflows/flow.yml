@@ -31,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add resources/stealth.min.js
+          git add src/main/resources/stealth.min.js
           git diff --cached --quiet || git commit -m "Update stealth.min.js to latest version"
           git push git@github.com:mike2367/Selenium_up.git HEAD:java-version
