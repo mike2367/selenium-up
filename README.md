@@ -1,6 +1,11 @@
-# Selenium_up
+# Selenium-up
 
 Commonly used web crawling toolkit and Selenium API framework.
+
+This is the introduction to the main python version of Selenium-up.
+
+### Java version is currently under development, please view `java-version` branch for more information.
+ 
 ## Table of Contents
 - [Getting Started](#getting-started)
   - [Install requirements](#install-the-required-packages)
