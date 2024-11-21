@@ -1,4 +1,4 @@
-name: Update stealth.min.js
+name: Update stealth.min.js-for java version
 
 # Trigger the workflow on a schedule and manually
 on:
