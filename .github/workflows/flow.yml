@@ -1,10 +1,12 @@
-name: Update stealth.min.js-for java version
+name: Update stealth.min.js - for java version
 
-# Trigger the workflow on a schedule and manually
+# Trigger the workflow on push to the java-version branch and weekly schedule
 on:
+  push:
+    branches:
+      - java-version  # Trigger on push events to the java-version branch
   schedule:
-    - cron: '0 7 * * 1'  # Runs daily at midnight UTC
-  workflow_dispatch:
+    - cron: '0 7 * * 1'  # Runs every Monday at 07:00 UTC
 
 jobs:
   update-stealth:
