@@ -1,7 +1,10 @@
-name: Update stealth.min.js 
+name: Java Update stealth.min.js 
 
 # Trigger the workflow on push to the java-version branch and weekly schedule
 on:
+  push:
+    branches:
+      - java-version  # Specifies the branch to monitor for push events
   schedule:
     - cron: '0 7 * * 1'  # Runs every Monday at 07:00 UTC
 
