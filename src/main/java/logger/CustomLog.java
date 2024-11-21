@@ -18,7 +18,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.jdom2.xpath.XPathExpression;
 
 
-class CustomLog {
+public class CustomLog {
     
     // Custom Exception for Invalid Log Levels
     private static class LogLevelNotFoundException extends Exception {
