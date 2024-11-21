@@ -4,9 +4,6 @@ name: Java Update stealth.min.js
 on:
   schedule:
     - cron: '0 7 * * 1'  # Runs every Monday at 07:00 UTC
-  push:
-    branches:
-      - java-version  
   workflow_dispatch:
 jobs:
   update-stealth:
