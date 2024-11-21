@@ -1,0 +1,34 @@
+name: Update stealth.min.js
+
+# Trigger the workflow on a schedule and manually
+on:
+  schedule:
+    - cron: '0 7 * * 1'  # Runs daily at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  update-stealth:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Clone stealth.min.js Repository
+        run: git clone git@github.com:requireCool/stealth.min.js.git remote-stealth
+        
+      - name: Update stealth.min.js
+        run: cp remote-stealth/stealth.min.js resources/stealth.min.js
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add resources/stealth.min.js
+          git diff --cached --quiet || git commit -m "Update stealth.min.js to latest version"
+          git push git@github.com:mike2367/Selenium_up.git HEAD:java-version
