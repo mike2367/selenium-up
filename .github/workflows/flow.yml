@@ -1,4 +1,4 @@
-name: Update stealth.min.js - for java version
+name: Update stealth.min.js 
 
 # Trigger the workflow on push to the java-version branch and weekly schedule
 on:
@@ -25,7 +25,7 @@ jobs:
         run: git clone git@github.com:requireCool/stealth.min.js.git remote-stealth
         
       - name: Update stealth.min.js
-        run: cp remote-stealth/stealth.min.js resources/stealth.min.js
+        run: cp remote-stealth/stealth.min.js src/main/resources/stealth.min.js
 
       - name: Commit and Push Changes
         run: |
