@@ -15,20 +15,32 @@ import java.util.Map;
 public class DriverAction {
     private WebDriver driver;
     private String inner_byString = "xpath";
-    private static final int GLOBAL_WAIT_TIME = 20;
+
+	private static int GLOBAL_WAIT_TIME = 20;
+    private static Boolean GLOBAL_DEBUG_LOG_SWTICH = true;
     /**@GLOBAL_DEBUG_LOG_LEVEL_STRING is set because the default debug mode ouput 
      * excessive information, feel free to alter it to true for debug level,
-     * remember to alter the one in logback.xml as well*/
-    private static final Boolean GLOBAL_DEBUG_LOG_LEVEL = false;
-    private static final Boolean GLOBAL_DEBUG_LOG_SWTICH = true;
+     * remember to alter the one in logback.xml as well.*/
+    /**We leave @error out of discussion because it is much more critical and will be 
+     * raised more aggressively. */
+    private static Boolean GLOBAL_LOG_LEVEL_DEBUG = false;
     private static final Logger logger = LoggerFactory.getLogger(DriverAction.class);
     
-    private void makeLog(String content) {
-    	if(GLOBAL_DEBUG_LOG_LEVEL){logger.debug(content);
+    /**
+     * Logs messages at DEBUG or INFO level based on GLOBAL_DEBUG_LOG_LEVEL.
+     * This method accepts both String and int parameters (and other Objects if needed).
+     *
+     * @param content Variable number of parameters (String, int, etc.) to log.
+     */
+    private void makeLog(String format, Object... args) {
+    	if(GLOBAL_DEBUG_LOG_SWTICH) {
+            if (GLOBAL_LOG_LEVEL_DEBUG) {
+                logger.debug(format, args);
+            } else {
+                logger.info(format, args);
+            }
     	}
-    	else {
-    		logger.info(content);
-    	}
+
     }
     public DriverAction(WebDriver driver, String inner_by) {
         this.driver = driver;
@@ -49,9 +61,8 @@ public class DriverAction {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(waitTime));
             WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(
             		this.ByLocator(this.inner_byString, locator)));
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.info("Waited for element {}", locator);
-            }
+                makeLog("Waited for element {}", locator);
+            
             return element;
         } catch (Exception e) {
             logger.error("Error waiting for element {}: {}", locator, e.getMessage());
@@ -71,9 +82,8 @@ public class DriverAction {
         try {
             WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             element.click();
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.info("Clicked on element {}", elementName);
-            }
+                makeLog("Clicked on element {}", elementName);
+            
             return List.copyOf(driver.getWindowHandles());
         } catch (Exception e) {
             logger.error("Failed to click element {}: {}", elementName, e.getMessage());
@@ -94,9 +104,8 @@ public class DriverAction {
             WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             Actions actions = new Actions(driver);
             actions.doubleClick(element).perform();
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.info("Double clicked on element {}", elementName);
-            }
+                makeLog("Double clicked on element {}", elementName);
+            
             return List.copyOf(driver.getWindowHandles());
         } catch (Exception e) {
             logger.error("Failed to double click element {}: {}", elementName, e.getMessage());
@@ -117,9 +126,8 @@ public class DriverAction {
             WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             Actions actions = new Actions(driver);
             actions.contextClick(element).perform();
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.info("Right clicked on element {}", elementName);
-            }
+                makeLog("Right clicked on element {}", elementName);
+            
             return List.copyOf(driver.getWindowHandles());
         } catch (Exception e) {
             logger.error("Failed to right click element {}: {}", elementName, e.getMessage());
@@ -139,9 +147,8 @@ public class DriverAction {
         try {
             WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             String result = element.getAttribute(attribute).trim();
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.info("Get attribute " + attribute + " on element " + locator + ", result: " + result);
-            }
+            makeLog("Get attribute " + attribute + " on element " + locator + ", result: " + result);
+            
             return result;
         } catch (Exception e) {
             logger.error("Failed to get attribute" + attribute + "from element "+locator+": " + e.getMessage());
@@ -160,9 +167,8 @@ public class DriverAction {
         try {
             WebElement element = wait(locator, GLOBAL_WAIT_TIME);
             element.sendKeys(keys);
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.debug("Input text '{}' into element {}", keys, locator);
-            }
+            makeLog("Input text '{}' into element {}", keys, locator);
+            
         } catch (Exception e) {
             logger.error("Failed to input keys into element {}: {}", locator, e.getMessage());
             throw e;
@@ -219,7 +225,7 @@ public class DriverAction {
                 actions.release().perform();
             }
             if (log) {
-                logger.debug("Slide element {} by offset {}", locator, offset);
+            	makeLog("Slide element {} by offset {}", locator, String.valueOf(offset));
             }
         } catch (Exception e) {
             logger.error("Failed to slide horizontally on element {}: {}", locator, e.getMessage());
@@ -251,9 +257,8 @@ public class DriverAction {
                 } else {
                     js.executeScript("window.scrollBy(0, " + pixel + ");");
                 }
-                if (GLOBAL_DEBUG_LOG_SWTICH) {
-                    logger.debug("Scroll down {} pixels", pixel);
-                }
+                	makeLog("Scroll down {} pixels", pixel);
+                
             } else if (locator != null) {
                 WebElement element = wait(locator, GLOBAL_WAIT_TIME);
                 if (slowly) {
@@ -271,9 +276,8 @@ public class DriverAction {
                 } else {
                     js.executeScript("arguments[0].scrollIntoView();", element);
                 }
-                if (GLOBAL_DEBUG_LOG_SWTICH) {
-                    logger.debug("Scroll down to element {}", locator);
-                }
+                   makeLog("Scroll down to element {}", locator);
+                
             } else {
                 if (slowly) {
                     Long height = (Long) js.executeScript("return document.body.scrollHeight");
@@ -290,9 +294,8 @@ public class DriverAction {
                     Thread.sleep((long) (sleepTime * 4000));
                     js.executeScript("window.scrollTo(0, 10000);");
                 }
-                if (GLOBAL_DEBUG_LOG_SWTICH) {
-                    logger.debug("Scroll down to the bottom");
-                }
+                makeLog("Scroll down to the bottom");
+                
             }
         } catch (Exception e) {
             logger.error("Failed to scroll down: {}", e.getMessage());
@@ -347,9 +350,8 @@ public class DriverAction {
             }
             driver.manage().addCookie(builder.build());
             cookie.remove("expiry"); // Remove 'expiry' as per original Python logic
-            if (GLOBAL_DEBUG_LOG_SWTICH) {
-                logger.debug("Added cookie: {}", cookie);
-            }
+            makeLog("Added cookie: {}", cookie);
+            
         } catch (Exception e) {
             logger.error("Failed to add single cookie {}: {}", cookie, e.getMessage());
             throw e;
@@ -372,7 +374,7 @@ public class DriverAction {
                     if (index >= 0 && index < windowHandles.size()) {
                         driver.switchTo().window(windowHandles.get(index));
                         if (log) {
-                            logger.debug("Switched to window {}", driver.getTitle());
+                        	makeLog("Switched to window {}", driver.getTitle());
                         }
                     } else {
                         throw new IndexOutOfBoundsException("Window index out of range: " + index);
@@ -385,7 +387,7 @@ public class DriverAction {
                 }
             }
             if (log) {
-                logger.debug("Window switch completed");
+            	makeLog("Window switch completed");
             }
             return driver.getTitle();
         } catch (Exception e) {
@@ -408,7 +410,7 @@ public class DriverAction {
                     WebElement frameElement = wait((String)action, GLOBAL_WAIT_TIME);
                     driver.switchTo().frame(frameElement);
                     if (log) {
-                        logger.debug("Switched to frame {}", action);
+                    	makeLog("Switched to frame {}", action);
                     }
                 } else if (action instanceof Runnable) {
                     Runnable func = (Runnable) action;
@@ -418,7 +420,7 @@ public class DriverAction {
                 }
             }
             if (log) {
-                logger.info("Frame switch completed");
+                makeLog("Frame switch completed");
             }
         } catch (Exception e) {
             logger.error("Failed to switch frames: {}", e.getMessage());
@@ -462,6 +464,7 @@ public class DriverAction {
      * @param driver The Selenium WebDriver instance.
      */
     public static void driverSignatureValidate(WebDriver driver) {
+
         Logger logger = LoggerFactory.getLogger(DriverAction.class);
         try {
             String baseUrl = "https://bot.sannysoft.com/";
@@ -486,4 +489,28 @@ public class DriverAction {
             throw e;
         }
     }
+    
+    /**Getters and Setters for GLOBAL parameters */
+    public int getGLOBAL_WAIT_TIME() {
+    	return GLOBAL_WAIT_TIME;
+    }
+    public void setGLOBAL_WAIT_TIME(int gLOBAL_WAIT_TIME) {
+    	GLOBAL_WAIT_TIME = gLOBAL_WAIT_TIME;
+    }
+    public Boolean getGLOBAL_DEBUG_LOG_SWTICH() {
+    	return GLOBAL_DEBUG_LOG_SWTICH;
+    }
+    public void setGLOBAL_DEBUG_LOG_SWTICH(Boolean gLOBAL_DEBUG_LOG_SWTICH) {
+    	GLOBAL_DEBUG_LOG_SWTICH = gLOBAL_DEBUG_LOG_SWTICH;
+    }
+    public Boolean getGLOBAL_LOG_LEVEL_DEBUG() {
+    	return GLOBAL_LOG_LEVEL_DEBUG;
+    }
+    public void setGLOBAL_DEBUG_LOG_LEVEL(Boolean gLOBAL_DEBUG_LOG_LEVEL) {
+    	GLOBAL_LOG_LEVEL_DEBUG = gLOBAL_DEBUG_LOG_LEVEL;
+    }
 }
+
+
+
+
