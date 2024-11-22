@@ -2,7 +2,11 @@ from typing import Literal, Union
 from selenium import webdriver
 from main import logger
 from os import path
-import settings
+import settings as settings
+
+from selenium.webdriver.chrome.service import Service as ChromeService
+
+from selenium.webdriver.firefox.service import Service as FirefoxService
 
 _STANDARD_DRIVER_OPTIONS: list = [
     "--incognito",
@@ -18,6 +22,7 @@ _EXPERIMENTAL_OPTIONS: dict = {
     "excludeSwitches": ['enable-automation', 'enable-logging']
 }
 
+_RETRY_CONNECT_TIMES = 3
 class _DriverCore:
     def __init__(self,
                  selenium_driver_type: Literal['Chrome', 'Firefox'] = 'Chrome',
@@ -71,6 +76,7 @@ class _DriverCore:
         # avoid repeated settings
         self.opt_params = list(set(self.opt_params))
 
+
         # for fingerprint elimination
         self.script_func = 'Page.addScriptToEvaluateOnNewDocument'
         self.CHR_mem_js = """
@@ -86,7 +92,7 @@ class _DriverCore:
                     get: () => undefined
                     })
                 """
-        with open('./resources/stealth.min.js', 'r') as f:
+        with open('../resources/stealth.min.js', 'r') as f:
             self.stealth_js = f.read()
         f.close()
 
@@ -146,13 +152,18 @@ class DriverInit(object):
         """
         if self._selenium_driverType == 'Chrome':
             options = webdriver.ChromeOptions()
-            # config your own binary loc in settings
-            options.binary_location = path.join(settings.CHROMIUM, "chrome.exe")
+            # config your own driver loc in settings
+            service = ChromeService(executable_path=path.join(settings.CHROMIUM, "chromedriver.exe"))
             for item in self._opt_params:
                 options.add_argument(item)
             for opt in _EXPERIMENTAL_OPTIONS:
                 options.add_experimental_option(opt, _EXPERIMENTAL_OPTIONS[opt])
-            driver = webdriver.Chrome(options=options)
+            for _ in range(_RETRY_CONNECT_TIMES):
+                try:
+                    driver = webdriver.Chrome(service=service, options=options)
+                    break
+                except:
+                    pass
             if driver:
                 driver.execute_cdp_cmd(self._script_func, {'source': self._stealth_js})
                 driver.execute_cdp_cmd(self._script_func, {"source": self._undefined_js})
@@ -167,10 +178,15 @@ class DriverInit(object):
         elif self._selenium_driverType == 'Firefox':
             options = webdriver.FirefoxOptions()
             # config your own binary loc in settings
-            options.binary_location = path.join(settings.FIREFOX, "firefox.exe")
+            service = FirefoxService(executable_path=path.join(settings.FIREFOX, "geckodriver.exe"))
             for item in self._opt_params:
                 options.add_argument(item)
-            driver = webdriver.Firefox(options=options)
+            for _ in range(_RETRY_CONNECT_TIMES):
+                try:
+                    driver = webdriver.Firefox(service=service, options=options)
+                    break
+                except:
+                    pass
             if driver:
                 logger.success("Selenium driver successfully initialized")
                 print(self._driver_core)
@@ -182,3 +198,6 @@ class DriverInit(object):
         return self._driver_core.__repr__()
     
 
+
+init = DriverInit("Firefox")
+init.get("https://www.google.com")

@@ -1,3 +1,0 @@
-CHROMIUM = "./chrome/"
-FIREFOX = "./firefox/"
-

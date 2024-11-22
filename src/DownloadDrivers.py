@@ -106,18 +106,18 @@ def extract_file(file_path, extract_path):
 def get_extraction_paths():
     if os.path.exists("settings.py"):
         try:
-            from settings import CHROMIUM, FIREFOX
+            from src.settings import CHROMIUM, FIREFOX
 
             return CHROMIUM, FIREFOX
         except ImportError as e:
             print("Error importing settings:", e)
     print("Settings file not found or incomplete. Please enter extraction paths.")
     chromium_path = (
-        input("Enter path for Chrome extraction (default ./chrome/): ") or "./chrome/"
+        input("Enter path for Chrome extraction (default resources/chrome/): ") or "resources/chrome/"
     )
     firefox_path = (
-        input("Enter path for Firefox extraction (default ./firefox/): ")
-        or "./firefox/"
+        input("Enter path for Firefox extraction (default resources/firefox/): ")
+        or "resources/firefox/"
     )
     return chromium_path, firefox_path
 

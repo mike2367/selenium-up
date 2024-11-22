@@ -2,13 +2,14 @@ from loguru import logger
 import yagmail
 import sys
 from typing import Union
+from datetime import datetime
 
 class CustomLog(object):
     def __new__(cls, *args, **kwargs):
         instance = super(CustomLog, cls).__new__(cls)
         instance.__init__(*args, **kwargs)
         return instance.custom_logger
-    def __init__(self, filepath: str = "./Log.log",
+    def __init__(self, filepath: str = f"./log-file/Log_{datetime.now().year}_{datetime.now().month}_{datetime.now().day}.log",
                      rotation: str = "00:00",
                      level: str = "DEBUG",
                      log_format: str = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
