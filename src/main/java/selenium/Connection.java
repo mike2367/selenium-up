@@ -15,6 +15,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.firefox.GeckoDriverService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +29,9 @@ public class Connection {
         "--disable-gpu",
         "--disable-blink-features=AutomationControlled"
     );
-    private static final Map<String, String> BROWSER_PATHS = Map.of(
-            "Chrome", "src/main/resources/chrome/chrome.exe",   // Update the path as per your environment
-            "Firefox", "src/main/resources/firefox/firefox.exe" // Update the path as per your environment
+    private static final Map<String, String> DRIVER_PATHS = Map.of(
+            "Chrome", "src/main/resources/chrome/chromedriver.exe",   // Update the path as per your environment
+            "Firefox", "src/main/resources/firefox/geckodriver.exe" // Update the path as per your environment
        );
 
     /**
@@ -98,16 +100,20 @@ public class Connection {
 
         private WebDriver initializeDriver() {
             if ("Chrome".equalsIgnoreCase(driverCore.seleniumDriverType)) {
+            	
                 ChromeOptions options = new ChromeOptions();
-                // Set your own binary location from settings
-                options.setBinary(BROWSER_PATHS.get("Chrome")); 
+
                 for (String option : driverCore.optParams) {
                     options.addArguments(option);
                 }
                 for (Map.Entry<String, Object> entry : EXPERIMENTAL_OPTIONS.entrySet()) {
                     options.setExperimentalOption(entry.getKey(), entry.getValue());
                 }
-                WebDriver driver = new ChromeDriver(options);
+                ChromeDriverService service = new ChromeDriverService.Builder()
+                        .usingDriverExecutable(Paths.get(DRIVER_PATHS.get("Chrome")).toFile())
+                        .usingAnyFreePort()
+                        .build();
+                WebDriver driver = new ChromeDriver(service, options);
                 if (driver != null) {
                     applyStealthScripts(driver);
                     logger.info("Selenium driver successfully initialized");
@@ -116,12 +122,15 @@ public class Connection {
                 }
             } else if ("Firefox".equalsIgnoreCase(driverCore.seleniumDriverType)) {
                 FirefoxOptions options = new FirefoxOptions();
-                // Set your own binary location from settings
-                options.setBinary(BROWSER_PATHS.get("Firefox")); 
                 for (String option : driverCore.optParams) {
                     options.addArguments(option);
                 }
-                WebDriver driver = new FirefoxDriver(options);
+                GeckoDriverService service = new GeckoDriverService.Builder()
+                        .usingDriverExecutable(Paths.get(DRIVER_PATHS.get("Firefox")).toFile())
+                        .usingAnyFreePort()
+                        .build();
+				
+                WebDriver driver = new FirefoxDriver(service, options);
                 if (driver != null) {
                     applyStealthScripts(driver);
                     logger.info("Selenium driver successfully initialized");
