@@ -9,19 +9,19 @@ import hashlib
 chrome_files_info = [
     (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/chrome-win/chrome.zip.001",
-        "10f671ea4c8325e4f6286e26e9565051a92ae0db8377d06b0f4d2b4d3babf145",
+        "10F671EA4C8325E4F6286E26E9565051A92AE0DB8377D06B0F4D2B4D3BABF145",
     ),
     (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/chrome-win/chrome.zip.002",
-        "9045148b91282238c7086489c79f7acd88d8ec6f6fa448015560bf38c7a6a041",
+        "662956F222514CFFBA3EFB9405EABEB3F2921EF61F597B97A2A73FDB965FA976",
     ),
     (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/chrome-win/chrome.zip.003",
-        "2d58643f6b13d1ef88f8caaf860f833e6680d5a933e2d5a345b3396e2d547b7d",
+        "5D3412FFAB59905918150CD0595AB1EE9E050C570F143F34E17ABCA7819A3707",
     ),
     (
         "https://raw.githubusercontent.com/mike2367/selenium-up/refs/heads/browser-drivers/chrome-win/chrome.zip.004",
-        "da16163d9520fe8bf9db83ef729bee9b01255b5260d89a841a4a261368c87c13",
+        "D13D234A8F4057BCA52644FADE142144E4FCB5CB8EDA917341C29069CB7D81B5",
     ),
 ]
 
