@@ -127,7 +127,7 @@ class DriverInit(object):
 
     """
     This function is explictly used for non-chrome browser to eliminate driver signiture
-    and is required to be executed every time close to the validation
+    and is required to be executed every time before possible validation
     """
 
     @staticmethod

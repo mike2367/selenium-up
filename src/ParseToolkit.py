@@ -128,7 +128,7 @@ class ParseToolKit:
 
     @staticmethod
     @logger.catch
-    def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> List[dict]:
+    def table_print(item_list: List[dict], title: str = "Info Table", log: bool = False) -> None:
         """
         Prints a table of items in a list of dictionaries.
 
@@ -145,7 +145,6 @@ class ParseToolKit:
         """
         if not item_list:
             logger.warning("No items to display in table.")
-            return item_list
         all_keys = set()
         for item in item_list:
             all_keys.update(item.keys())
@@ -173,7 +172,7 @@ class ParseToolKit:
                 log_table.add_row([str(item.get(key, '')) for key in sorted_keys])
             logger.info("\nInfo Table Output:\n" + log_table.get_string())
 
-        return item_list
+
 
 
 
