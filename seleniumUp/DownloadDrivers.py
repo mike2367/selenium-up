@@ -106,7 +106,7 @@ def extract_file(file_path, extract_path):
 def get_extraction_paths():
     if os.path.exists("settings.py"):
         try:
-            from src.settings import CHROMIUM, FIREFOX
+            from seleniumUp.settings import CHROMIUM, FIREFOX
 
             return CHROMIUM, FIREFOX
         except ImportError as e:

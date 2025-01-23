@@ -1,4 +1,4 @@
-from main import logger
+from .main import logger
 from typing import List, Iterator
 from prettytable import PrettyTable
 

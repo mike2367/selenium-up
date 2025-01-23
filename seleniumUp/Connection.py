@@ -1,8 +1,8 @@
 from typing import Literal, Union
 from selenium import webdriver
-from main import logger
+from .main import logger
 from os import path
-import settings as settings
+from .settings import CHROMIUM, FIREFOX
 
 from selenium.webdriver.chrome.service import Service as ChromeService
 
@@ -153,7 +153,7 @@ class DriverInit(object):
         if self._selenium_driverType == 'Chrome':
             options = webdriver.ChromeOptions()
             # config your own driver loc in settings
-            service = ChromeService(executable_path=path.join(settings.CHROMIUM, "chromedriver.exe"))
+            service = ChromeService(executable_path=path.join(CHROMIUM, "chromedriver.exe"))
             for item in self._opt_params:
                 options.add_argument(item)
             for opt in _EXPERIMENTAL_OPTIONS:
@@ -178,7 +178,7 @@ class DriverInit(object):
         elif self._selenium_driverType == 'Firefox':
             options = webdriver.FirefoxOptions()
             # config your own binary loc in settings
-            service = FirefoxService(executable_path=path.join(settings.FIREFOX, "geckodriver.exe"))
+            service = FirefoxService(executable_path=path.join(FIREFOX, "geckodriver.exe"))
             for item in self._opt_params:
                 options.add_argument(item)
             for _ in range(_RETRY_CONNECT_TIMES):

@@ -1,6 +1,6 @@
-from main import logger
-from Connection import DriverInit
-from DriverAction import DriverAction, By
+from .main import logger
+from .Connection import DriverInit
+from .DriverAction import DriverAction, By
 from abc import ABC, abstractmethod
 from typing import Union, List
 

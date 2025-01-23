@@ -1,5 +1,5 @@
 import os
-from Log import CustomLog
+from .Log import CustomLog
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 os.chdir(current_directory)

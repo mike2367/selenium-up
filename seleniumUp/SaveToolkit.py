@@ -1,8 +1,9 @@
-from main import logger
+from .main import logger
 from typing import List, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 import csv
+
 
 
 def error_rollback(func):

@@ -1,8 +1,8 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from typing import Union, List, Callable
-from main import logger
-from Log import CustomLog
+from .main import logger
+from .Log import CustomLog
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
@@ -81,7 +81,7 @@ class DriverAction:
         Scrolls the web page down and logs the action.
     """
 
-    def __init__(self, driver, by: By, contact:Union[dict, None] = None, 
+    def __init__(self, driver, by: By = By.XPATH, contact:Union[dict, None] = None, 
                  email_level = "CRITICAL") -> None:
         self._driver = driver
         self._by = by
