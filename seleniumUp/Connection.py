@@ -196,8 +196,3 @@ class DriverInit(object):
 
     def __repr__(self) -> str:
         return self._driver_core.__repr__()
-    
-
-
-init = DriverInit("Firefox")
-init.get("https://www.google.com")
