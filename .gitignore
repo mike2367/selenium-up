@@ -14,3 +14,5 @@ venv
 *.csv
 
 .idea
+
+seleniumUp/unit-test

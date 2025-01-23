@@ -41,7 +41,7 @@ def wait_element_decorator(func: Callable) -> Callable:
         return func(self, value, *args, log=kwargs.get('log', True), by=by, **kwargs)
     return wrapper
 
-class DriverAction:
+class DriverAction(object):
     """
     A class to perform various actions on web elements using Selenium WebDriver.
 
