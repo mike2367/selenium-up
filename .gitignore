@@ -16,3 +16,14 @@ venv
 .idea
 
 seleniumUp/unit-test
+
+dist
+
+seleniumUp1.egg-info
+
+pyproject.toml
+
+setup.py
+
+*.cfg
+
