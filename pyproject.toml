@@ -1,0 +1,19 @@
+[project]
+name = "seleniumUp"
+version = "0.1.0"
+authors = [
+  { name="mike2367", email="mike23671@gmail.com" },
+]
+description = "A wrapped selenium package built for easy use"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/mike2367/selenium-up"
+Issues = "https://github.com/mike2367/selenium-up/issues"
